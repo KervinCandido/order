@@ -1,0 +1,97 @@
+package br.com.fiap.restaurant.pedido.infra.config;
+
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.util.Map;
+
+@Configuration
+public class RabbitMQConfig {
+
+    public static final String EXCHANGE_NAME = "ex.order";
+    public static final String CONFIRM_ORDER_QUEUE = "payment.order.confirm";
+
+    public static final String CONFIRM_ORDER_ROUTING_KEY = "order.config";
+
+    /*Consumer*/
+    public static final String RESTAURANT_CREATE_QUEUE = "order.restaurant.create";
+    public static final String RESTAURANT_UPDATE_QUEUE = "order.restaurant.update";
+    public static final String RESTAURANT_DELETE_QUEUE = "order.restaurant.delete";
+
+    public static final String MENU_ITEM_UPDATE_QUEUE = "order.menuitem.update";
+    public static final String MENU_ITEM_DELETE_QUEUE = "order.menuitem.delete";
+
+    @Bean("orderExchange")
+    public DirectExchange orderExchange() {
+        return new DirectExchange(EXCHANGE_NAME);
+    }
+
+    @Bean("confirmOrderQueue")
+    public Queue confirmOrderQueue() {
+        return QueueBuilder.durable(CONFIRM_ORDER_QUEUE).quorum().build();
+    }
+
+    @Bean
+    public Binding binding(@Qualifier("confirmOrderQueue") Queue queue, @Qualifier("orderExchange") DirectExchange directExchange) {
+        return BindingBuilder.bind(queue).to(directExchange).with(CONFIRM_ORDER_ROUTING_KEY);
+    }
+
+    /*Consumer*/
+
+    @Bean("createRestaurantQueue")
+    public Queue createRestaurantQueue() {
+        return QueueBuilder
+                .durable(RESTAURANT_CREATE_QUEUE)
+                .quorum()
+                .build();
+    }
+
+    @Bean("updateRestaurantQueue")
+    public Queue updateRestaurantQueue() {
+        return QueueBuilder
+                .durable(RESTAURANT_UPDATE_QUEUE)
+                .quorum()
+                .build();
+    }
+
+    @Bean("deleteRestaurantQueue")
+    public Queue deleteRestaurantQueue() {
+        return QueueBuilder
+                .durable(RESTAURANT_DELETE_QUEUE)
+                .quorum()
+                .build();
+    }
+
+    @Bean("menuItemUpdateQueue")
+    public Queue menuItemUpdateQueue() {
+        return QueueBuilder
+                .durable(MENU_ITEM_UPDATE_QUEUE)
+                .quorum()
+                .build();
+    }
+
+    @Bean("menuItemDeleteQueue")
+    public Queue menuItemDeleteQueue() {
+        return QueueBuilder
+                .durable(MENU_ITEM_DELETE_QUEUE)
+                .quorum()
+                .build();
+    }
+
+    @Bean
+    public JacksonJsonMessageConverter jsonMessageConverter() {
+        return new JacksonJsonMessageConverter();
+    }
+
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        var rabbitTemplate = new RabbitTemplate(connectionFactory);
+        rabbitTemplate.setMessageConverter(jsonMessageConverter());
+        return rabbitTemplate;
+    }
+}

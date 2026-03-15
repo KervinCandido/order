@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: restaurant-cleanarch
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: false
+    table: history_flyway
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  rabbitmq:
+    host: ${MQ_HOST:localhost}
+    port: ${MQ_PORT:5672}
+    username: ${MQ_USER:restaurant-mq}
+    password: ${MQ_PASSWORD:password-mq}
+    listener.simple.acknowledge-mode: manual
+server:
+  port: 8082
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+  default-produces-media-type: application/json
+  default-consumes-media-type: application/json
+
+
+
+
