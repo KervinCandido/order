@@ -18,12 +18,12 @@ import java.io.IOException;
 import java.util.Objects;
 
 @Component
-public class CreateRestaurantConsumer {
+public class RestaurantConsumer {
 
-    private static final Logger logger = LoggerFactory.getLogger(CreateRestaurantConsumer.class);
+    private static final Logger logger = LoggerFactory.getLogger(RestaurantConsumer.class);
     private final MenuItemController menuItemController;
 
-    public CreateRestaurantConsumer(MenuItemController menuItemController) {
+    public RestaurantConsumer(MenuItemController menuItemController) {
         this.menuItemController = Objects.requireNonNull(menuItemController, "menuItemController cannot be null.");
     }
 
@@ -41,6 +41,37 @@ public class CreateRestaurantConsumer {
             channel.basicAck(tag, false);
         } catch (Exception e) {
             logger.error("Error consuming create restaurant event: {}", e.getMessage(), e);
+            channel.basicNack(tag, false, true);
+        }
+    }
+
+    @RabbitListener(queues = {RabbitMQConfig.RESTAURANT_UPDATE_QUEUE})
+    public void updateRestaurant(EventDTO<RestaurantDTO> eventDTO, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
+        try {
+            logger.info("Consuming update restaurant event: {}", eventDTO);
+            var restaurantDTO = eventDTO.body();
+            var updateAllMenuItemsInput = new UpdateAllMenuItemsInput(restaurantDTO.id(), restaurantDTO
+                    .menu()
+                    .parallelStream()
+                    .map(i -> new MenuItemInput(i.id(), i.name(), i.price(), i.restaurantOnly()))
+                    .toList());
+            menuItemController.updateAllMenuItems(updateAllMenuItemsInput);
+            channel.basicAck(tag, false);
+        } catch (Exception e) {
+            logger.error("Error update create restaurant event: {}", e.getMessage(), e);
+            channel.basicNack(tag, false, true);
+        }
+    }
+
+    @RabbitListener(queues = {RabbitMQConfig.RESTAURANT_DELETE_QUEUE})
+    public void deleteRestaurant(EventDTO<RestaurantDTO> eventDTO, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
+        try {
+            logger.info("Consuming delete restaurant event: {}", eventDTO);
+            var restaurantDTO = eventDTO.body();
+            menuItemController.deleteByRestaurantId(restaurantDTO.id());
+            channel.basicAck(tag, false);
+        } catch (Exception e) {
+            logger.error("Error delete create restaurant event: {}", e.getMessage(), e);
             channel.basicNack(tag, false, true);
         }
     }
