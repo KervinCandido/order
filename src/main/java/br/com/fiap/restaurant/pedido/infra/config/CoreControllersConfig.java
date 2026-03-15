@@ -2,6 +2,7 @@ package br.com.fiap.restaurant.pedido.infra.config;
 
 import br.com.fiap.restaurant.pedido.core.controller.MenuItemController;
 import br.com.fiap.restaurant.pedido.core.controller.OrderController;
+import br.com.fiap.restaurant.pedido.core.usecase.menuitem.DeleteAllMenuItemsByRestaurantIdUsecase;
 import br.com.fiap.restaurant.pedido.core.usecase.menuitem.UpdateAllMenuItemsUsecase;
 import br.com.fiap.restaurant.pedido.core.usecase.order.ConfirmOrderUseCase;
 import br.com.fiap.restaurant.pedido.core.usecase.order.CreateOrderUsecase;
@@ -12,8 +13,9 @@ import org.springframework.context.annotation.Configuration;
 public class CoreControllersConfig {
 
     @Bean
-    MenuItemController menuItemController(UpdateAllMenuItemsUsecase updateAllMenuItemsUsecase) {
-        return new MenuItemController(updateAllMenuItemsUsecase);
+    MenuItemController menuItemController(UpdateAllMenuItemsUsecase updateAllMenuItemsUsecase,
+                                          DeleteAllMenuItemsByRestaurantIdUsecase deleteAllMenuItemsByRestaurantIdUsecase) {
+        return new MenuItemController(updateAllMenuItemsUsecase, deleteAllMenuItemsByRestaurantIdUsecase);
     }
 
     @Bean

@@ -14,7 +14,7 @@ public class UpdateAllMenuItemsUsecase {
     private final MenuItemGateway menuItemGateway;
 
     public UpdateAllMenuItemsUsecase(MenuItemGateway menuItemGateway) {
-        this.menuItemGateway = menuItemGateway;
+        this.menuItemGateway = Objects.requireNonNull(menuItemGateway, "menuItemGateway cannot be null");
     }
 
     public void update(UpdateAllMenuItemsInput input) {
