@@ -10,4 +10,6 @@ public interface MenuItemGateway {
     void deleteAllByRestaurantId(Long restaurantId);
 
     void saveAll(List<MenuItem> menuItems);
+
+    void deleteById(Long restaurantId);
 }

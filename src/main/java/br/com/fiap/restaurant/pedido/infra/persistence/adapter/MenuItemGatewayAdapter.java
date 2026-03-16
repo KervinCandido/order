@@ -32,4 +32,9 @@ public class MenuItemGatewayAdapter implements MenuItemGateway {
         var menuItemsEntities = menuItems.parallelStream().map(MenuItemMapper::toMenuItemEntity).toList();
         menuItemRepository.saveAll(menuItemsEntities);
     }
+
+    @Override
+    public void deleteById(Long menuItemId) {
+        menuItemRepository.deleteById(menuItemId);
+    }
 }

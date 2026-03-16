@@ -2,9 +2,9 @@ package br.com.fiap.restaurant.pedido.infra.message.consumer;
 
 import br.com.fiap.restaurant.pedido.core.controller.MenuItemController;
 import br.com.fiap.restaurant.pedido.core.inbound.MenuItemInput;
-import br.com.fiap.restaurant.pedido.core.inbound.UpdateAllMenuItemsInput;
 import br.com.fiap.restaurant.pedido.infra.config.RabbitMQConfig;
 import br.com.fiap.restaurant.pedido.infra.message.dto.EventDTO;
+import br.com.fiap.restaurant.pedido.infra.message.dto.MenuItemDTO;
 import br.com.fiap.restaurant.pedido.infra.message.dto.RestaurantDTO;
 import com.rabbitmq.client.Channel;
 import org.slf4j.Logger;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.function.Function;
 
 @Component
 public class RestaurantConsumer {
@@ -32,12 +33,8 @@ public class RestaurantConsumer {
         try {
             logger.info("Consuming create restaurant event: {}", eventDTO);
             var restaurantDTO = eventDTO.body();
-            var updateAllMenuItemsInput = new UpdateAllMenuItemsInput(restaurantDTO.id(), restaurantDTO
-                    .menu()
-                    .parallelStream()
-                    .map(i -> new MenuItemInput(i.id(), i.name(), i.price(), i.restaurantOnly()))
-                    .toList());
-            menuItemController.updateAllMenuItems(updateAllMenuItemsInput);
+            var menuItemsInput = restaurantDTO.menu().parallelStream().map(toMenuItemInput()).toList();
+            menuItemController.createMenuItems(menuItemsInput);
             channel.basicAck(tag, false);
         } catch (Exception e) {
             logger.error("Error consuming create restaurant event: {}", e.getMessage(), e);
@@ -50,12 +47,8 @@ public class RestaurantConsumer {
         try {
             logger.info("Consuming update restaurant event: {}", eventDTO);
             var restaurantDTO = eventDTO.body();
-            var updateAllMenuItemsInput = new UpdateAllMenuItemsInput(restaurantDTO.id(), restaurantDTO
-                    .menu()
-                    .parallelStream()
-                    .map(i -> new MenuItemInput(i.id(), i.name(), i.price(), i.restaurantOnly()))
-                    .toList());
-            menuItemController.updateAllMenuItems(updateAllMenuItemsInput);
+            var updateAllMenuItemsInput = restaurantDTO.menu().parallelStream().map(toMenuItemInput()).toList();
+            menuItemController.updateAllMenuItemsOfRestaurant(restaurantDTO.id(), updateAllMenuItemsInput);
             channel.basicAck(tag, false);
         } catch (Exception e) {
             logger.error("Error update create restaurant event: {}", e.getMessage(), e);
@@ -74,5 +67,9 @@ public class RestaurantConsumer {
             logger.error("Error delete create restaurant event: {}", e.getMessage(), e);
             channel.basicNack(tag, false, true);
         }
+    }
+
+    private Function<MenuItemDTO, MenuItemInput> toMenuItemInput() {
+        return i -> new MenuItemInput(i.id(), i.name(), i.price(), i.restaurantOnly(), i.restaurantId());
     }
 }
