@@ -23,7 +23,7 @@ public class ConfirmOrderUseCase {
         this.confirmOrderPublisher = Objects.requireNonNull(confirmOrderPublisher, "ConfirmOrderPublisher cannot be null");
     }
 
-    public void confirm(Long orderId) {
+    public void confirmOrderBy(Long orderId) {
         Objects.requireNonNull(orderId, "orderId cannot be null");
 
         Order order = orderGateway.findById(orderId).orElseThrow(() -> new BusinessException("Order not found"));
