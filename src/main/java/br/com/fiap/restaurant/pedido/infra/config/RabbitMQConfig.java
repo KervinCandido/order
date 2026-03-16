@@ -25,6 +25,9 @@ public class RabbitMQConfig {
     public static final String MENU_ITEM_UPDATE_QUEUE = "order.menuitem.update";
     public static final String MENU_ITEM_DELETE_QUEUE = "order.menuitem.delete";
 
+    public static final String ORDER_PAYMENT_APPROVED = "order.payment.approved";
+    public static final String ORDER_PAYMENT_PENDING = "order.payment.pending";
+
     @Bean("orderExchange")
     public DirectExchange orderExchange() {
         return new DirectExchange(EXCHANGE_NAME);
@@ -86,6 +89,22 @@ public class RabbitMQConfig {
     public Queue menuItemDeleteQueue() {
         return QueueBuilder
                 .durable(MENU_ITEM_DELETE_QUEUE)
+                .quorum()
+                .build();
+    }
+
+    @Bean("orderPaymentApproved")
+    public Queue orderPaymentApproved() {
+        return QueueBuilder
+                .durable(ORDER_PAYMENT_APPROVED)
+                .quorum()
+                .build();
+    }
+
+    @Bean("orderPaymentPending")
+    public Queue orderPaymentPending() {
+        return QueueBuilder
+                .durable(ORDER_PAYMENT_PENDING)
                 .quorum()
                 .build();
     }

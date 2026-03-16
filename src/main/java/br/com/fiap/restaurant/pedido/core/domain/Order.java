@@ -28,10 +28,21 @@ public class Order {
     }
 
     public void confirm() {
-        // TODO implementar padrão State, máquina de estado gera muito complexidado para esse caso
         if (!this.status.equals(StatusOrder.CREATED))
             throw new OperationNotAllowedException("Order cannot be confirmed in this situation");
         this.status = StatusOrder.APPROVED;
+    }
+
+    public void pendingPay() {
+        if (!this.status.equals(StatusOrder.APPROVED))
+            throw new OperationNotAllowedException("Order cannot be paid in this situation");
+        this.status = StatusOrder.PENDING_PAY;
+    }
+
+    public void pay() {
+        if (!this.status.equals(StatusOrder.APPROVED))
+            throw new OperationNotAllowedException("Order cannot be paid in this situation");
+        this.status = StatusOrder.PAYED;
     }
 
     public void addOrderItem(OrderItem orderItem) {
