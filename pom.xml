@@ -74,6 +74,32 @@
             <artifactId>h2</artifactId>
             <scope>runtime</scope> <!-- Para testes in-memory -->
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope> <!-- Traz JUnit 5, incluindo assertDoesNotThrow -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa-test</artifactId>
+            <scope>test</scope> <!-- Traz JUnit 5, incluindo assertDoesNotThrow -->
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security-test</artifactId>
+            <scope>test</scope> <!-- Traz JUnit 5, incluindo assertDoesNotThrow -->
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.27.7</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -108,6 +134,73 @@
                         </exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.14</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/OrderApplication.class</exclude>
+                        <exclude>**/core/inbound/**.class</exclude>
+                        <exclude>**/core/outbound/**.class</exclude>
+                        <exclude>**/core/exception/**.class</exclude>
+                        <exclude>**/infra/config/**.class</exclude>
+                        <exclude>**/infra/controller/request/**.class</exclude>
+                        <exclude>**/infra/controller/response/**.class</exclude>
+                        <exclude>**/infra/message/dto/**.class</exclude>
+                        <exclude>**/infra/persistence/entity/**.class</exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase> <!-- Ajustado para verify: roda após testes e build -->
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/site/jacoco</outputDirectory>
+                            <formats> <!-- Adicionado: Gera XML para Codecov e HTML para local -->
+                                <format>XML</format>
+                                <format>HTML</format>
+                            </formats>
+                        </configuration>
+                    </execution>
+                    <!-- Opcional: Enforce cobertura mínima de 80% (falha build se abaixo) -->
+                    <execution>
+                        <id>check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>INSTRUCTION</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.10</minimum> <!-- 80% de instruções cobertas -->
+                                        </limit>
+                                        <limit>
+                                            <counter>BRANCH</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.10</minimum> <!-- 80% de branches -->
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <!-- Copia o mockito-core para um caminho fixo em target/agents -->
             <plugin>

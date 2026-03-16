@@ -18,11 +18,11 @@ public class OrderItem {
         this.id = id;
 
         if (quantity.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("The quantity must be greater than zero.");
+            throw new IllegalArgumentException("quantity must be greater than zero");
         }
 
         if (unitPrice.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("The unit price must be greater than zero.");
+            throw new IllegalArgumentException("unit price must be greater than zero");
         }
     }
 
