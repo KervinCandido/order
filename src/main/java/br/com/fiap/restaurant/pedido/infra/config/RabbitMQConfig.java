@@ -21,6 +21,7 @@ public class RabbitMQConfig {
     public static final String RESTAURANT_UPDATE_QUEUE = "order.restaurant.update";
     public static final String RESTAURANT_DELETE_QUEUE = "order.restaurant.delete";
 
+    public static final String MENU_ITEM_CREATE_QUEUE = "order.menuitem.create";
     public static final String MENU_ITEM_UPDATE_QUEUE = "order.menuitem.update";
     public static final String MENU_ITEM_DELETE_QUEUE = "order.menuitem.delete";
 
@@ -61,6 +62,14 @@ public class RabbitMQConfig {
     public Queue deleteRestaurantQueue() {
         return QueueBuilder
                 .durable(RESTAURANT_DELETE_QUEUE)
+                .quorum()
+                .build();
+    }
+
+    @Bean("menuItemCreateQueue")
+    public Queue menuItemCreateQueue() {
+        return QueueBuilder
+                .durable(MENU_ITEM_CREATE_QUEUE)
                 .quorum()
                 .build();
     }
