@@ -9,11 +9,9 @@ import br.com.fiap.restaurant.pedido.core.exception.UserNotAuthenticatedExceptio
 import br.com.fiap.restaurant.pedido.core.gateway.LoggedUserGateway;
 import br.com.fiap.restaurant.pedido.core.gateway.MenuItemGateway;
 import br.com.fiap.restaurant.pedido.core.gateway.OrderGateway;
-import br.com.fiap.restaurant.pedido.core.gateway.PublisherGateway;
 import br.com.fiap.restaurant.pedido.core.inbound.CreateOrderInput;
 import br.com.fiap.restaurant.pedido.core.inbound.OrderItemInput;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +24,7 @@ public class CreateOrderUsecase {
     private final MenuItemGateway menuItemGateway;
     private final OrderGateway orderGateway;
     private final LoggedUserGateway loggedUserGateway;
+    
     public CreateOrderUsecase(MenuItemGateway menuItemGateway, OrderGateway orderGateway, LoggedUserGateway loggedUserGateway) {
         this.menuItemGateway = Objects.requireNonNull(menuItemGateway, "menuItemGateway cannot be null.");
         this.orderGateway = Objects.requireNonNull(orderGateway, "orderGateway cannot be null.");
