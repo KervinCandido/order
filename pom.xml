@@ -213,12 +213,12 @@
                                         <limit>
                                             <counter>INSTRUCTION</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.42</minimum> <!-- 80% de instruções cobertas -->
+                                            <minimum>0.50</minimum> <!-- 80% de instruções cobertas -->
                                         </limit>
                                         <limit>
                                             <counter>BRANCH</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.42</minimum> <!-- 80% de branches -->
+                                            <minimum>0.50</minimum> <!-- 80% de branches -->
                                         </limit>
                                     </limits>
                                 </rule>
