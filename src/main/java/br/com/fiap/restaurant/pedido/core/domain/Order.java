@@ -35,7 +35,7 @@ public class Order {
 
     public void pendingPay() {
         if (!this.status.equals(StatusOrder.APPROVED))
-            throw new OperationNotAllowedException("Order cannot be paid in this situation");
+            throw new OperationNotAllowedException("Order cannot be pending paid in this situation");
         this.status = StatusOrder.PENDING_PAY;
     }
 
