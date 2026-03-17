@@ -16,7 +16,7 @@ public record OrderItemResponse (
             orderItemOutput.menuItemId(),
             orderItemOutput.name(),
             orderItemOutput.quantity(),
-            orderItemOutput.price(),
+            orderItemOutput.unitPrice(),
             orderItemOutput.total()
         );
     }

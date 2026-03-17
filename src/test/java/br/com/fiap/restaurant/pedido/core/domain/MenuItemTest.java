@@ -33,7 +33,7 @@ class MenuItemTest {
             // Assert
             assertThat(menuItem.getId()).isEqualTo(id);
             assertThat(menuItem.getName()).isEqualTo(name);
-            assertThat(menuItem.getPrice()).isEqualTo(price);
+            assertThat(menuItem.getUnitPrice()).isEqualTo(price);
             assertThat(menuItem.isRestaurantOnly()).isEqualTo(restaurantOnly);
             assertThat(menuItem.getRestaurantId()).isEqualTo(restaurantId);
         }
@@ -92,7 +92,7 @@ class MenuItemTest {
             // Act & Assert
             assertThatThrownBy(() -> new MenuItem(1L, name, null, restaurantOnly, restaurantId))
                     .isInstanceOf(NullPointerException.class)
-                    .hasMessage("price cannot be null");
+                    .hasMessage("unitPrice cannot be null");
         }
 
         @Test
@@ -107,7 +107,7 @@ class MenuItemTest {
             // Act & Assert
             assertThatThrownBy(() -> new MenuItem(1L, name, price, restaurantOnly, restaurantId))
                     .isInstanceOf(BusinessException.class)
-                    .hasMessage("price must be greater than zero");
+                    .hasMessage("unitPrice must be greater than zero");
         }
 
         @Test
@@ -122,7 +122,7 @@ class MenuItemTest {
             // Act & Assert
             assertThatThrownBy(() -> new MenuItem(1L, name, price, restaurantOnly, restaurantId))
                     .isInstanceOf(BusinessException.class)
-                    .hasMessage("price must be greater than zero");
+                    .hasMessage("unitPrice must be greater than zero");
         }
 
         @Test

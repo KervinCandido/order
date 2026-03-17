@@ -6,6 +6,6 @@ public record OrderItemOutput (
         Long menuItemId,
         String name,
         BigDecimal quantity,
-        BigDecimal price,
+        BigDecimal unitPrice,
         BigDecimal total
 ) {}

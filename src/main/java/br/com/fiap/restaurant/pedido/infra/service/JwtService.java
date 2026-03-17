@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -20,6 +21,7 @@ public class JwtService {
     private final JwtDecoder jwtDecoder;
 
     public JwtService(JwtDecoder jwtDecoder) {
+        Objects.requireNonNull(jwtDecoder, "jwtDecoder cannot be null");
         this.jwtDecoder = jwtDecoder;
     }
 

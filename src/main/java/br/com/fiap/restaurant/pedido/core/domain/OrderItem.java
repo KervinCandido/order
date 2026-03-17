@@ -14,7 +14,7 @@ public class OrderItem {
     public OrderItem(Long id, MenuItem menuItem, BigDecimal quantity, BigDecimal unitPrice) {
         this.menuItem = Objects.requireNonNull(menuItem, "menuItem cannot be null.");
         this.quantity = Objects.requireNonNull(quantity, "quantity cannot be null.");
-        this.unitPrice = Objects.requireNonNull(unitPrice, "quantity cannot be null.");
+        this.unitPrice = Objects.requireNonNull(unitPrice, "unitPrice cannot be null.");
         this.id = id;
 
         if (quantity.compareTo(BigDecimal.ZERO) <= 0) {
@@ -22,12 +22,12 @@ public class OrderItem {
         }
 
         if (unitPrice.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("unit price must be greater than zero");
+            throw new IllegalArgumentException("unitPrice must be greater than zero");
         }
     }
 
     public OrderItem(MenuItem menuItem, BigDecimal quantity) {
-        this(null, menuItem, quantity, menuItem.getPrice());
+        this(null, menuItem, quantity, menuItem.getUnitPrice());
     }
 
     public Long getId() {

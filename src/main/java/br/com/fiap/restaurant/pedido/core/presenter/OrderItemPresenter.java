@@ -12,7 +12,7 @@ public class OrderItemPresenter {
             orderItem.getMenuItem().getId(),
             orderItem.getMenuItem().getName(),
             orderItem.getQuantity(),
-            orderItem.getMenuItem().getPrice(),
+            orderItem.getMenuItem().getUnitPrice(),
             orderItem.getTotal()
         );
     }
