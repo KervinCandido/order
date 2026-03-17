@@ -169,6 +169,19 @@ class OrderTest {
         }
 
         @Test
+        @DisplayName("Deve alterar o status para PAYED quando o pedido está PENDING_PAY")
+        void devePagarPedidoPendentePagamento() {
+            // Arrange
+            var order = new Order(1L, restaurantId, customerUuid, items, orderDateTime, StatusOrder.PENDING_PAY);
+
+            // Act
+            order.pay();
+
+            // Assert
+            assertThat(order.getStatus()).isEqualTo(StatusOrder.PAYED);
+        }
+
+        @Test
         @DisplayName("Deve lançar exceção ao tentar pagar um pedido com status diferente de APPROVED")
         void deveLancarExcecaoAoPagarPedidoComStatusIncorreto() {
             // Arrange

@@ -40,7 +40,7 @@ public class Order {
     }
 
     public void pay() {
-        if (!this.status.equals(StatusOrder.APPROVED))
+        if (!(this.status.equals(StatusOrder.APPROVED) || this.status.equals(StatusOrder.PENDING_PAY)))
             throw new OperationNotAllowedException("Order cannot be paid in this situation");
         this.status = StatusOrder.PAYED;
     }
