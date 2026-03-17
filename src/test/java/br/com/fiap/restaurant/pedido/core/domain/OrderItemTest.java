@@ -55,7 +55,7 @@ class OrderItemTest {
             assertThat(orderItem.getId()).isNull();
             assertThat(orderItem.getMenuItem()).isEqualTo(menuItem);
             assertThat(orderItem.getQuantity()).isEqualTo(quantity);
-            assertThat(orderItem.getUnitPrice()).isEqualTo(menuItem.getPrice());
+            assertThat(orderItem.getUnitPrice()).isEqualTo(menuItem.getUnitPrice());
         }
 
         @Test
@@ -92,7 +92,7 @@ class OrderItemTest {
             // Act & Assert
             assertThatThrownBy(() -> new OrderItem(1L, menuItem, quantity, null))
                     .isInstanceOf(NullPointerException.class)
-                    .hasMessage("quantity cannot be null.");
+                    .hasMessage("unitPrice cannot be null.");
         }
 
         @Test
@@ -131,7 +131,7 @@ class OrderItemTest {
             // Act & Assert
             assertThatThrownBy(() -> new OrderItem(1L, menuItem, quantity, unitPrice))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("unit price must be greater than zero");
+                    .hasMessage("unitPrice must be greater than zero");
         }
 
         @Test
@@ -144,7 +144,7 @@ class OrderItemTest {
             // Act & Assert
             assertThatThrownBy(() -> new OrderItem(1L, menuItem, quantity, unitPrice))
                     .isInstanceOf(IllegalArgumentException.class)
-                    .hasMessage("unit price must be greater than zero");
+                    .hasMessage("unitPrice must be greater than zero");
         }
     }
 

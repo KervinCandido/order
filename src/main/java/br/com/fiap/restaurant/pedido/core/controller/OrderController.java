@@ -12,6 +12,8 @@ import java.util.Objects;
 
 public class OrderController {
 
+    public static final String ORDER_ID_CANNOT_BE_NULL_MESSAGE = "orderId cannot be null";
+
     private final CreateOrderUsecase createOrderUsecase;
     private final ConfirmOrderUseCase confirmOrderUseCase;
     private final PendingOrderUseCase pendingOrderUseCase;
@@ -31,15 +33,17 @@ public class OrderController {
     }
 
     public void confirm(Long orderId) {
-        Objects.requireNonNull(orderId, "orderId cannot be null.");
+        Objects.requireNonNull(orderId, ORDER_ID_CANNOT_BE_NULL_MESSAGE);
         confirmOrderUseCase.confirmOrderBy(orderId);
     }
 
     public void payOrder(Long orderId) {
-        pendingOrderUseCase.pendingOrderById(orderId);
+        Objects.requireNonNull(orderId, ORDER_ID_CANNOT_BE_NULL_MESSAGE);
+        payOrderUseCase.payOrderById(orderId);
     }
 
     public void pendingPaymentOrder(Long orderId) {
-        payOrderUseCase.payOrderById(orderId);
+        Objects.requireNonNull(orderId, ORDER_ID_CANNOT_BE_NULL_MESSAGE);
+        pendingOrderUseCase.pendingOrderById(orderId);
     }
 }

@@ -9,26 +9,26 @@ public class MenuItem {
 
     private final Long id;
     private final String name;
-    private final BigDecimal price;
+    private final BigDecimal unitPrice;
     private final boolean restaurantOnly;
     private final Long restaurantId;
 
-    public MenuItem(Long menuItemId, String name, BigDecimal price, boolean restaurantOnly, Long restaurantId) {
+    public MenuItem(Long menuItemId, String name, BigDecimal unitPrice, boolean restaurantOnly, Long restaurantId) {
         Objects.requireNonNull(menuItemId, "menuItemId cannot be null");
         Objects.requireNonNull(name, "name cannot be null");
-        Objects.requireNonNull(price, "price cannot be null");
+        Objects.requireNonNull(unitPrice, "unitPrice cannot be null");
         Objects.requireNonNull(restaurantId, "restaurantId cannot be null");
 
         if (name.isBlank()) {
             throw new BusinessException("name cannot be empty");
         }
-        if (price.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BusinessException("price must be greater than zero");
+        if (unitPrice.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException("unitPrice must be greater than zero");
         }
 
         this.id = menuItemId;
         this.name = name.strip();
-        this.price = price;
+        this.unitPrice = unitPrice;
         this.restaurantOnly = restaurantOnly;
         this.restaurantId = restaurantId;
     }
@@ -41,8 +41,8 @@ public class MenuItem {
         return name;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public BigDecimal getUnitPrice() {
+        return unitPrice;
     }
 
     public Long getRestaurantId() {

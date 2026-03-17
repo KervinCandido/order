@@ -11,7 +11,7 @@ public class MenuItemMapper {
         var entity = new MenuItemEntity();
         entity.setId(menuItem.getId());
         entity.setName(menuItem.getName());
-        entity.setPrice(menuItem.getPrice());
+        entity.setPrice(menuItem.getUnitPrice());
         entity.setRestaurantId(menuItem.getRestaurantId());
         return entity;
     }
