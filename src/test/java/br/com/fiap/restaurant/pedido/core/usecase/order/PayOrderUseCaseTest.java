@@ -3,7 +3,7 @@ package br.com.fiap.restaurant.pedido.core.usecase.order;
 import br.com.fiap.restaurant.pedido.core.domain.Order;
 import br.com.fiap.restaurant.pedido.core.domain.StatusOrder;
 import br.com.fiap.restaurant.pedido.core.exception.BusinessException;
-import br.com.fiap.restaurant.pedido.core.exception.OperationNotAllowedException;
+import br.com.fiap.restaurant.pedido.core.exception.InvalidOrderStateException;
 import br.com.fiap.restaurant.pedido.core.gateway.OrderGateway;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -84,7 +84,7 @@ class PayOrderUseCaseTest {
 
             // When & Then
             assertThatThrownBy(() -> payOrderUseCase.payOrderById(orderId))
-                    .isInstanceOf(OperationNotAllowedException.class)
+                    .isInstanceOf(InvalidOrderStateException.class)
                     .hasMessage("Order cannot be paid in this situation");
 
             then(orderGateway).should().findById(orderId);

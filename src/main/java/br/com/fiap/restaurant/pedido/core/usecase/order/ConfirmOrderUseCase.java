@@ -2,7 +2,7 @@ package br.com.fiap.restaurant.pedido.core.usecase.order;
 
 import br.com.fiap.restaurant.pedido.core.domain.Order;
 import br.com.fiap.restaurant.pedido.core.exception.BusinessException;
-import br.com.fiap.restaurant.pedido.core.exception.OperationNotAllowedException;
+import br.com.fiap.restaurant.pedido.core.exception.OrderOwnershipException;
 import br.com.fiap.restaurant.pedido.core.exception.UserNotAuthenticatedException;
 import br.com.fiap.restaurant.pedido.core.gateway.LoggedUserGateway;
 import br.com.fiap.restaurant.pedido.core.gateway.OrderGateway;
@@ -32,7 +32,7 @@ public class ConfirmOrderUseCase {
         UUID currentUserUUid = loggedUserGateway.getCurrentUser().orElseThrow(UserNotAuthenticatedException::new);
 
         if (!customerUuid.equals(currentUserUUid)) {
-            throw new OperationNotAllowedException("Current user cannot confirm this order");
+            throw new OrderOwnershipException();
         }
 
         order.confirm();

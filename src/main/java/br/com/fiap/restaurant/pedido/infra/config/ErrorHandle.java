@@ -1,8 +1,6 @@
 package br.com.fiap.restaurant.pedido.infra.config;
 
-import br.com.fiap.restaurant.pedido.core.exception.BusinessException;
-import br.com.fiap.restaurant.pedido.core.exception.InvalidCredentialsException;
-import br.com.fiap.restaurant.pedido.core.exception.OperationNotAllowedException;
+import br.com.fiap.restaurant.pedido.core.exception.*;
 import br.com.fiap.restaurant.pedido.infra.controller.response.FieldErrorResponse;
 import br.com.fiap.restaurant.pedido.infra.controller.response.SimpleErrorResponse;
 import org.springframework.context.MessageSource;
@@ -52,9 +50,21 @@ public class ErrorHandle {
         return new SimpleErrorResponse(e.getMessage());
     }
 
+    @ResponseStatus(code = HttpStatus.FORBIDDEN)
+    @ExceptionHandler(OrderOwnershipException.class)
+    public SimpleErrorResponse handleOrderOwnershipException(OrderOwnershipException e) {
+        return new SimpleErrorResponse(e.getMessage());
+    }
+
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(BusinessException.class)
     public SimpleErrorResponse handleBusinessException(BusinessException e) {
+        return new SimpleErrorResponse(e.getMessage());
+    }
+
+    @ResponseStatus(code = HttpStatus.UNPROCESSABLE_CONTENT)
+    @ExceptionHandler(InvalidOrderStateException.class)
+    public SimpleErrorResponse handleInvalidOrderStateException(InvalidOrderStateException e) {
         return new SimpleErrorResponse(e.getMessage());
     }
 

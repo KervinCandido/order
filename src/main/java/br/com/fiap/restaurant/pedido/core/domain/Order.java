@@ -1,6 +1,6 @@
 package br.com.fiap.restaurant.pedido.core.domain;
 
-import br.com.fiap.restaurant.pedido.core.exception.OperationNotAllowedException;
+import br.com.fiap.restaurant.pedido.core.exception.InvalidOrderStateException;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -29,19 +29,19 @@ public class Order {
 
     public void confirm() {
         if (!this.status.equals(StatusOrder.CREATED))
-            throw new OperationNotAllowedException("Order cannot be confirmed in this situation");
+            throw new InvalidOrderStateException("Order cannot be confirmed in this situation");
         this.status = StatusOrder.APPROVED;
     }
 
     public void pendingPay() {
         if (!this.status.equals(StatusOrder.APPROVED))
-            throw new OperationNotAllowedException("Order cannot be pending paid in this situation");
+            throw new InvalidOrderStateException("Order cannot be pending paid in this situation");
         this.status = StatusOrder.PENDING_PAY;
     }
 
     public void pay() {
         if (!(this.status.equals(StatusOrder.APPROVED) || this.status.equals(StatusOrder.PENDING_PAY)))
-            throw new OperationNotAllowedException("Order cannot be paid in this situation");
+            throw new InvalidOrderStateException("Order cannot be paid in this situation");
         this.status = StatusOrder.PAYED;
     }
 
