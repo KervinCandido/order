@@ -175,6 +175,7 @@
                         <exclude>**/infra/controller/response/**.class</exclude>
                         <exclude>**/infra/message/dto/**.class</exclude>
                         <exclude>**/infra/persistence/entity/**.class</exclude>
+                        <exclude>**/infra/persistence/repository/**.class</exclude>
                     </excludes>
                 </configuration>
                 <executions>
