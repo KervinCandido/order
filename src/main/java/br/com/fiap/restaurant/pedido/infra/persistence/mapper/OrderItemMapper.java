@@ -13,7 +13,7 @@ public class OrderItemMapper {
         var orderItemEntity = new OrderItemEntity();
         orderItemEntity.setId(orderItem.getId());
         orderItemEntity.setQuantity(orderItem.getQuantity());
-        orderItemEntity.setPrice(orderItem.getUnitPrice());
+        orderItemEntity.setUnitPrice(orderItem.getUnitPrice());
         orderItemEntity.setOrder(orderEntity);
         orderItemEntity.setMenuItem(MenuItemMapper.toMenuItemEntity(orderItem.getMenuItem()));
         return orderItemEntity;
@@ -25,7 +25,7 @@ public class OrderItemMapper {
             orderItemEntity.getId(),
             menuItem,
             orderItemEntity.getQuantity(),
-            menuItem.getUnitPrice()
+            orderItemEntity.getUnitPrice()
         );
     }
 }
