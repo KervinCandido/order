@@ -1,6 +1,6 @@
 package br.com.fiap.restaurant.pedido.core.domain;
 
-import br.com.fiap.restaurant.pedido.core.exception.OperationNotAllowedException;
+import br.com.fiap.restaurant.pedido.core.exception.InvalidOrderStateException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -126,7 +126,7 @@ class OrderTest {
 
             // Act & Assert
             assertThatThrownBy(order::confirm)
-                    .isInstanceOf(OperationNotAllowedException.class)
+                    .isInstanceOf(InvalidOrderStateException.class)
                     .hasMessageContaining("Order cannot be confirmed in this situation");
         }
 
@@ -151,7 +151,7 @@ class OrderTest {
 
             // Act & Assert
             assertThatThrownBy(order::pendingPay)
-                    .isInstanceOf(OperationNotAllowedException.class)
+                    .isInstanceOf(InvalidOrderStateException.class)
                     .hasMessage("Order cannot be pending paid in this situation");
         }
 
@@ -189,7 +189,7 @@ class OrderTest {
 
             // Act & Assert
             assertThatThrownBy(order::pay)
-                    .isInstanceOf(OperationNotAllowedException.class)
+                    .isInstanceOf(InvalidOrderStateException.class)
                     .hasMessage("Order cannot be paid in this situation");
         }
     }
