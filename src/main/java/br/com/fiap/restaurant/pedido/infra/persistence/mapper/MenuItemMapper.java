@@ -11,12 +11,12 @@ public class MenuItemMapper {
         var entity = new MenuItemEntity();
         entity.setId(menuItem.getId());
         entity.setName(menuItem.getName());
-        entity.setPrice(menuItem.getUnitPrice());
+        entity.setUnitPrice(menuItem.getUnitPrice());
         entity.setRestaurantId(menuItem.getRestaurantId());
         return entity;
     }
 
     public static MenuItem toMenuItem(MenuItemEntity menuItemEntity) {
-        return new MenuItem(menuItemEntity.getId(), menuItemEntity.getName(), menuItemEntity.getPrice(), menuItemEntity.isRestaurantOnly(), menuItemEntity.getRestaurantId());
+        return new MenuItem(menuItemEntity.getId(), menuItemEntity.getName(), menuItemEntity.getUnitPrice(), menuItemEntity.isRestaurantOnly(), menuItemEntity.getRestaurantId());
     }
 }

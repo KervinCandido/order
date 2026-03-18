@@ -17,8 +17,8 @@ public class MenuItemEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private BigDecimal price;
+    @Column(nullable = false, name = "unit_price")
+    private BigDecimal unitPrice;
 
     @Column(name = "restaurant_only", nullable = false)
     private boolean restaurantOnly;
@@ -42,12 +42,12 @@ public class MenuItemEntity {
         this.name = name;
     }
 
-    public BigDecimal getPrice() {
-        return price;
+    public BigDecimal getUnitPrice() {
+        return unitPrice;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
+    public void setUnitPrice(BigDecimal unitPrice) {
+        this.unitPrice = unitPrice;
     }
 
     public boolean isRestaurantOnly() {

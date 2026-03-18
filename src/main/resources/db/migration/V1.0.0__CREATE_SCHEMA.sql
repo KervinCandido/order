@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS menu_item (
     id BIGINT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-    price NUMERIC(19, 2) NOT NULL,
+    unit_price NUMERIC(19, 2) NOT NULL,
     restaurant_only BOOLEAN NOT NULL,
     restaurant_id BIGINT NOT NULL
 );
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS orders (
 CREATE TABLE IF NOT EXISTS order_item (
     id BIGSERIAL PRIMARY KEY,
     menu_item_id BIGINT NOT NULL,
-    price NUMERIC(19, 2) NOT NULL,
+    unit_price NUMERIC(19, 2) NOT NULL,
     quantity NUMERIC(19, 2) NOT NULL,
     order_id BIGINT NOT NULL,
     CONSTRAINT fk_order_item_menu_item FOREIGN KEY (menu_item_id) REFERENCES menu_item(id),
