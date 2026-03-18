@@ -59,10 +59,14 @@ class OrderMapperTest {
         @DisplayName("Deve converter um OrderEntity para Order de domínio")
         void deveConverterEntidadeParaDominio() {
             // Given
+            var restaurantId = 1L;
+
             var menuItemEntity = new MenuItemEntity();
             menuItemEntity.setId(2L);
             menuItemEntity.setName("Entity Item");
             menuItemEntity.setUnitPrice(new BigDecimal("99.99"));
+            menuItemEntity.setRestaurantOnly(false);
+            menuItemEntity.setRestaurantId(restaurantId);
 
             var orderItemEntity = new OrderItemEntity();
             orderItemEntity.setId(20L);
@@ -72,7 +76,7 @@ class OrderMapperTest {
 
             var orderEntity = new OrderEntity();
             orderEntity.setId(200L);
-            orderEntity.setRestaurantId(2L);
+            orderEntity.setRestaurantId(restaurantId);
             orderEntity.setCustomerUuid(UUID.randomUUID());
             orderEntity.setOrderDateTime(LocalDateTime.now());
             orderEntity.setStatusOrder(StatusOrder.APPROVED);
