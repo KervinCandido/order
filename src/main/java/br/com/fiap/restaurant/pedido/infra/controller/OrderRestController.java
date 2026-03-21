@@ -1,9 +1,12 @@
 package br.com.fiap.restaurant.pedido.infra.controller;
 
 import br.com.fiap.restaurant.pedido.core.controller.OrderController;
+import br.com.fiap.restaurant.pedido.core.domain.StatusOrder;
+import br.com.fiap.restaurant.pedido.core.domain.pagination.Page;
 import br.com.fiap.restaurant.pedido.infra.controller.request.OrderRequest;
 import br.com.fiap.restaurant.pedido.infra.controller.response.OrderResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,6 +14,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.Set;
 
 @RestController
 @RequestMapping("/restaurants/{restaurant-id}/orders")
@@ -61,6 +66,25 @@ public class OrderRestController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    // TODO  Consultar todos os pedidos associados ao cliente autenticado.
+    @Operation(
+        summary = "Buscar pedidos do usuário autenticado", description = "Busca todos os pedidos associados ao cliente autenticado.",
+        parameters = {
+            @Parameter(name = "pageNumber", description = "Número da página", example = "0"),
+            @Parameter(name = "pageSize", description = "Tamanho da página", example = "10"),
+            @Parameter(name = "statusOrders", description = "Lista de status para filtrar os pedidos", example = "DRAFT,PAYED")
+        }
+    )
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Pagina com pedidos encontrados"),
+    })
+    @GetMapping
+    public ResponseEntity<Page<OrderResponse>> findOrdersByCurrentUser(
+            @RequestParam(required = false, name = "pageNumber", defaultValue = "0") Integer pageNumber,
+            @RequestParam(required = false, name = "pageSize", defaultValue = "10") Integer pageSize,
+            @RequestParam(required = false, name = "statusOrders") Set<StatusOrder> statusOrders) {
+        var page = orderController.findOrderByCurrentUser(statusOrders, pageNumber, pageSize);
+        return ResponseEntity.ok(page.mapItems(OrderResponse::new));
+    }
+
     // TODO Alterar enquanto em draft
 }

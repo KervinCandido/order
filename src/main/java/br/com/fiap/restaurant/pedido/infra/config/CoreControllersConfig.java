@@ -20,11 +20,7 @@ public class CoreControllersConfig {
     }
 
     @Bean
-    OrderController orderController(CreateOrderUsecase createOrderUsecase,
-                                    ConfirmOrderUseCase confirmOrderUseCase,
-                                    PendingOrderUseCase pendingOrderUseCase,
-                                    PayOrderUseCase payOrderUseCase,
-                                    FindOrderByIdUsecase findOrderByIdUsecase) {
-        return new OrderController(createOrderUsecase, confirmOrderUseCase, pendingOrderUseCase, payOrderUseCase, findOrderByIdUsecase);
+    OrderController orderController(OrderUsecaseFacade orderUsecaseFacade) {
+        return new OrderController(orderUsecaseFacade);
     }
 }

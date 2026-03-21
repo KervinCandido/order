@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -130,6 +131,133 @@ class OrderGatewayAdapterIT {
 
             // Then
             assertThat(result).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("Busca de Pedidos por Usuário")
+    class FindOrdersByUser {
+
+        private final int pageNumber = 0;
+        private final int pageSize = 10;
+
+        @Test
+        @DisplayName("Deve retornar uma lista de pedidos para um determinado usuário")
+        void deveRetornarListaDePedidosPorUsuario() {
+            // Given
+            var userUuid = UUID.randomUUID();
+            var orderEntity1 = new OrderEntity();
+            orderEntity1.setCustomerUuid(userUuid);
+            orderEntity1.setRestaurantId(1L);
+            orderEntity1.setStatusOrder(StatusOrder.DRAFT);
+            orderEntity1.setOrderDateTime(LocalDateTime.now());
+            orderEntity1.setOrderItems(List.of());
+            orderRepository.save(orderEntity1);
+
+            var orderEntity2 = new OrderEntity();
+            orderEntity2.setCustomerUuid(userUuid);
+            orderEntity2.setRestaurantId(1L);
+            orderEntity2.setStatusOrder(StatusOrder.CREATED);
+            orderEntity2.setOrderDateTime(LocalDateTime.now());
+            orderEntity2.setOrderItems(List.of());
+            orderRepository.save(orderEntity2);
+
+            // When
+            var result = orderGatewayAdapter.findByUser(userUuid, pageNumber, pageSize);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.pageNumber()).isEqualTo(pageNumber);
+            assertThat(result.pageSize()).isEqualTo(pageSize);
+            assertThat(result.totalElements()).isEqualTo(2);
+            assertThat(result.content()).hasSize(2);
+            assertThat(result.content().getFirst().getCustomerUuid()).isEqualTo(userUuid);
+        }
+
+        @Test
+        @DisplayName("Deve retornar uma lista vazia se o usuário não tiver pedidos")
+        void deveRetornarListaVaziaSeUsuarioNaoTiverPedidos() {
+            // Given
+            var userUuid = UUID.randomUUID();
+
+            // When
+            var result = orderGatewayAdapter.findByUser(userUuid, pageNumber, pageSize);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.pageNumber()).isEqualTo(pageNumber);
+            assertThat(result.pageSize()).isEqualTo(pageSize);
+            assertThat(result.totalElements()).isZero();
+            assertThat(result.content()).isEmpty();
+        }
+    }
+
+    @Nested
+    @DisplayName("Busca de Pedidos por Usuário e Status")
+    class FindOrdersByUserAndStatus {
+
+        private final int pageNumber = 0;
+        private final int pageSize = 10;
+        private final Set<StatusOrder> statusOrders = Set.of(StatusOrder.CREATED, StatusOrder.DRAFT);
+
+        @Test
+        @DisplayName("Deve retornar uma lista de pedidos para um usuário com um status específico")
+        void deveRetornarListaDePedidosPorUsuarioEStatus() {
+            // Given
+            var userUuid = UUID.randomUUID();
+            var status = StatusOrder.CREATED;
+
+            var orderEntity1 = new OrderEntity();
+            orderEntity1.setCustomerUuid(userUuid);
+            orderEntity1.setRestaurantId(1L);
+            orderEntity1.setStatusOrder(status);
+            orderEntity1.setOrderDateTime(LocalDateTime.now());
+            orderEntity1.setOrderItems(List.of());
+            orderRepository.save(orderEntity1);
+
+            var orderEntity2 = new OrderEntity();
+            orderEntity2.setCustomerUuid(userUuid);
+            orderEntity2.setRestaurantId(1L);
+            orderEntity2.setStatusOrder(StatusOrder.DRAFT);
+            orderEntity2.setOrderDateTime(LocalDateTime.now());
+            orderEntity2.setOrderItems(List.of());
+            orderRepository.save(orderEntity2);
+
+            // When
+            var result = orderGatewayAdapter.findByUserAndStatus(userUuid, statusOrders, pageNumber, pageSize);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.pageNumber()).isEqualTo(pageNumber);
+            assertThat(result.pageSize()).isEqualTo(pageSize);
+            assertThat(result.totalElements()).isEqualTo(2);
+            assertThat(result.content()).hasSize(2);
+        }
+
+        @Test
+        @DisplayName("Deve retornar uma lista vazia se não houver pedidos com o status especificado")
+        void deveRetornarListaVaziaSeNaoHouverPedidosComStatus() {
+            // Given
+            var userUuid = UUID.randomUUID();
+            var status = StatusOrder.CREATED;
+
+            var orderEntity1 = new OrderEntity();
+            orderEntity1.setCustomerUuid(userUuid);
+            orderEntity1.setRestaurantId(1L);
+            orderEntity1.setStatusOrder(StatusOrder.DRAFT);
+            orderEntity1.setOrderDateTime(LocalDateTime.now());
+            orderEntity1.setOrderItems(List.of());
+            orderRepository.save(orderEntity1);
+
+            // When
+            var result = orderGatewayAdapter.findByUserAndStatus(userUuid, Set.of(status), pageNumber, pageSize);
+
+            // Then
+            assertThat(result).isNotNull();
+            assertThat(result.pageNumber()).isEqualTo(pageNumber);
+            assertThat(result.pageSize()).isEqualTo(pageSize);
+            assertThat(result.totalElements()).isZero();
+            assertThat(result.content()).isEmpty();
         }
     }
 }
