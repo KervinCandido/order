@@ -54,7 +54,7 @@ class ConfirmOrderUseCaseTest {
             // Given
             var orderId = 1L;
             var customerUuid = UUID.randomUUID();
-            var order = new Order(orderId, 1L, customerUuid, new ArrayList<>(), LocalDateTime.now(), StatusOrder.CREATED);
+            var order = new Order(orderId, 1L, customerUuid, new ArrayList<>(), LocalDateTime.now(), StatusOrder.DRAFT);
 
             given(orderGateway.findById(orderId)).willReturn(Optional.of(order));
             given(loggedUserGateway.getCurrentUser()).willReturn(Optional.of(customerUuid));
@@ -63,7 +63,7 @@ class ConfirmOrderUseCaseTest {
             confirmOrderUseCase.confirmOrderBy(orderId);
 
             // Then
-            assertThat(order.getStatus()).isEqualTo(StatusOrder.APPROVED);
+            assertThat(order.getStatus()).isEqualTo(StatusOrder.CREATED);
             then(orderGateway).should().save(order);
             then(confirmOrderPublisher).should().publish(order);
         }
@@ -90,7 +90,7 @@ class ConfirmOrderUseCaseTest {
             // Given
             var orderId = 1L;
             var customerUuid = UUID.randomUUID();
-            var order = new Order(orderId, 1L, customerUuid, new ArrayList<>(), LocalDateTime.now(), StatusOrder.CREATED);
+            var order = new Order(orderId, 1L, customerUuid, new ArrayList<>(), LocalDateTime.now(), StatusOrder.DRAFT);
 
             given(orderGateway.findById(orderId)).willReturn(Optional.of(order));
             given(loggedUserGateway.getCurrentUser()).willReturn(Optional.empty());
@@ -111,7 +111,7 @@ class ConfirmOrderUseCaseTest {
             var orderId = 1L;
             var orderCustomerUuid = UUID.randomUUID();
             var loggedUserUuid = UUID.randomUUID();
-            var order = new Order(orderId, 1L, orderCustomerUuid, new ArrayList<>(), LocalDateTime.now(), StatusOrder.CREATED);
+            var order = new Order(orderId, 1L, orderCustomerUuid, new ArrayList<>(), LocalDateTime.now(), StatusOrder.DRAFT);
 
             given(orderGateway.findById(orderId)).willReturn(Optional.of(order));
             given(loggedUserGateway.getCurrentUser()).willReturn(Optional.of(loggedUserUuid));

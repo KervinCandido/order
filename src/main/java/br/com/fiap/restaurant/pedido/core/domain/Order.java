@@ -28,19 +28,19 @@ public class Order {
     }
 
     public void confirm() {
-        if (!this.status.equals(StatusOrder.CREATED))
+        if (!this.status.equals(StatusOrder.DRAFT))
             throw new InvalidOrderStateException("Order cannot be confirmed in this situation");
-        this.status = StatusOrder.APPROVED;
+        this.status = StatusOrder.CREATED;
     }
 
     public void pendingPay() {
-        if (!this.status.equals(StatusOrder.APPROVED))
+        if (!this.status.equals(StatusOrder.CREATED))
             throw new InvalidOrderStateException("Order cannot be pending paid in this situation");
         this.status = StatusOrder.PENDING_PAY;
     }
 
     public void pay() {
-        if (!(this.status.equals(StatusOrder.APPROVED) || this.status.equals(StatusOrder.PENDING_PAY)))
+        if (!(this.status.equals(StatusOrder.CREATED) || this.status.equals(StatusOrder.PENDING_PAY)))
             throw new InvalidOrderStateException("Order cannot be paid in this situation");
         this.status = StatusOrder.PAYED;
     }

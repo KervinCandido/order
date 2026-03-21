@@ -31,7 +31,7 @@ class OrderMapperTest {
             // Given
             var menuItem = new MenuItem(1L, "Item", BigDecimal.TEN, false, 1L);
             var orderItem = new OrderItem(10L, menuItem, BigDecimal.ONE, BigDecimal.TEN);
-            var order = new Order(100L, 1L, UUID.randomUUID(), List.of(orderItem), LocalDateTime.now(), StatusOrder.CREATED);
+            var order = new Order(100L, 1L, UUID.randomUUID(), List.of(orderItem), LocalDateTime.now(), StatusOrder.DRAFT);
 
             // When
             OrderEntity entity = OrderMapper.toOrderEntity(order);
@@ -79,7 +79,7 @@ class OrderMapperTest {
             orderEntity.setRestaurantId(restaurantId);
             orderEntity.setCustomerUuid(UUID.randomUUID());
             orderEntity.setOrderDateTime(LocalDateTime.now());
-            orderEntity.setStatusOrder(StatusOrder.APPROVED);
+            orderEntity.setStatusOrder(StatusOrder.CREATED);
             orderEntity.setOrderItems(List.of(orderItemEntity));
 
             // When

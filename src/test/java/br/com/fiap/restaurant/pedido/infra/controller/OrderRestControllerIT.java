@@ -7,7 +7,7 @@ import br.com.fiap.restaurant.pedido.infra.config.CoreGatewayConfig;
 import br.com.fiap.restaurant.pedido.infra.config.CoreUsecaseConfig;
 import br.com.fiap.restaurant.pedido.infra.controller.request.OrderItemRequest;
 import br.com.fiap.restaurant.pedido.infra.controller.request.OrderRequest;
-import br.com.fiap.restaurant.pedido.infra.message.publisher.ConfirmOrderPublisher;
+import br.com.fiap.restaurant.pedido.infra.message.publisher.CreatedOrderPublisher;
 import br.com.fiap.restaurant.pedido.infra.persistence.entity.MenuItemEntity;
 import br.com.fiap.restaurant.pedido.infra.persistence.entity.OrderEntity;
 import br.com.fiap.restaurant.pedido.infra.persistence.repository.MenuItemRepository;
@@ -57,7 +57,7 @@ class OrderRestControllerIT {
     private MenuItemRepository menuItemRepository;
 
     @MockitoBean
-    private ConfirmOrderPublisher confirmOrderPublisher;
+    private CreatedOrderPublisher createdOrderPublisher;
 
     private static final String USER_ID = "a2c9a844-6d27-4817-8226-8b4309b65ef5";
 
@@ -97,7 +97,7 @@ class OrderRestControllerIT {
             var orderRequest = new OrderRequest(List.of(orderItemRequest));
 
             // When
-            mockMvc.perform(post("/{restaurantId}/orders", restaurantId)
+            mockMvc.perform(post("/restaurants/{restaurant-id}/orders", restaurantId)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(orderRequest)))
                     .andExpect(status().isCreated())
@@ -108,7 +108,7 @@ class OrderRestControllerIT {
             var orders = orderRepository.findAll();
             assertThat(orders).hasSize(1);
             assertThat(orders.getFirst().getCustomerUuid()).isEqualTo(UUID.fromString(USER_ID));
-            assertThat(orders.getFirst().getStatusOrder()).isEqualTo(StatusOrder.CREATED);
+            assertThat(orders.getFirst().getStatusOrder()).isEqualTo(StatusOrder.DRAFT);
         }
     }
 
@@ -122,17 +122,17 @@ class OrderRestControllerIT {
         void deveConfirmarPedidoComSucesso() throws Exception {
             // Given
             var restaurantId = 1L;
-            var savedOrder = createOrderInDatabase(StatusOrder.CREATED, USER_ID);
+            var savedOrder = createOrderInDatabase(StatusOrder.DRAFT, USER_ID);
 
             // When
-            mockMvc.perform(post("/{restaurantId}/orders/confirm/{orderId}", restaurantId, savedOrder.getId()))
+            mockMvc.perform(post("/restaurants/{restaurant-id}/orders/confirm/{orderId}", restaurantId, savedOrder.getId()))
                     .andExpect(status().isNoContent());
 
             // Then
             var confirmedOrder = orderRepository.findById(savedOrder.getId());
             assertThat(confirmedOrder).isPresent();
-            assertThat(confirmedOrder.get().getStatusOrder()).isEqualTo(StatusOrder.APPROVED);
-            then(confirmOrderPublisher).should().publish(any(Order.class));
+            assertThat(confirmedOrder.get().getStatusOrder()).isEqualTo(StatusOrder.CREATED);
+            then(createdOrderPublisher).should().publish(any(Order.class));
         }
 
         @Test
@@ -140,10 +140,10 @@ class OrderRestControllerIT {
         @DisplayName("Deve retornar 404 Not Found ao tentar confirmar pedido de outro usuário")
         void deveRetornarNotFoundAoConfirmarPedidoDeOutroUsuario() throws Exception {
             // Given
-            var savedOrder = createOrderInDatabase(StatusOrder.CREATED, USER_ID);
+            var savedOrder = createOrderInDatabase(StatusOrder.DRAFT, USER_ID);
 
             // When & Then
-            mockMvc.perform(post("/{restaurantId}/orders/confirm/{orderId}", savedOrder.getRestaurantId(), savedOrder.getId()))
+            mockMvc.perform(post("/restaurants/{restaurant-id}/orders/confirm/{orderId}", savedOrder.getRestaurantId(), savedOrder.getId()))
                     .andExpect(status().isForbidden())
                     .andExpect(jsonPath("$.message").value("Current user cannot confirm this order"));
         }
@@ -156,7 +156,7 @@ class OrderRestControllerIT {
             var savedOrder = createOrderInDatabase(StatusOrder.PAYED, USER_ID);
 
             // When & Then
-            mockMvc.perform(post("/{restaurantId}/orders/confirm/{orderId}", savedOrder.getRestaurantId(), savedOrder.getId()))
+            mockMvc.perform(post("/restaurants/{restaurant-id}/orders/confirm/{orderId}", savedOrder.getRestaurantId(), savedOrder.getId()))
                     .andExpect(status().isUnprocessableContent())
                     .andExpect(jsonPath("$.message").value("Order cannot be confirmed in this situation"));
         }
@@ -169,7 +169,7 @@ class OrderRestControllerIT {
             var savedOrder = createOrderInDatabase(StatusOrder.PENDING_PAY, USER_ID);
 
             // When & Then
-            mockMvc.perform(post("/{restaurantId}/orders/confirm/{orderId}", savedOrder.getRestaurantId(), savedOrder.getId()))
+            mockMvc.perform(post("/restaurants/{restaurant-id}/orders/confirm/{orderId}", savedOrder.getRestaurantId(), savedOrder.getId()))
                     .andExpect(status().isUnprocessableContent())
                     .andExpect(jsonPath("$.message").value("Order cannot be confirmed in this situation"));
         }
