@@ -35,6 +35,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -74,6 +75,49 @@ class OrderRestControllerIT {
         order.setStatusOrder(status);
         order.setOrderDateTime(LocalDateTime.now());
         return orderRepository.save(order);
+    }
+
+    @Nested
+    @DisplayName("Busca de Pedido por ID")
+    class FindOrderById {
+
+        @Test
+        @WithMockUser(username = USER_ID)
+        @DisplayName("Deve retornar 200 OK e o pedido quando o pedido for encontrado")
+        void deveRetornarOkQuandoPedidoEncontrado() throws Exception {
+            // Given
+            var savedOrder = createOrderInDatabase(StatusOrder.DRAFT, USER_ID);
+
+            // When & Then
+            mockMvc.perform(get("/restaurants/{restaurant-id}/orders/{order-id}", savedOrder.getRestaurantId(), savedOrder.getId()))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.id").value(savedOrder.getId()));
+        }
+
+        @Test
+        @WithMockUser(username = USER_ID)
+        @DisplayName("Deve retornar 404 Not Found quando o pedido não for encontrado")
+        void deveRetornarNotFoundQuandoPedidoNaoEncontrado() throws Exception {
+            // Given
+            var restaurantId = 1L;
+            var nonExistentOrderId = 999L;
+
+            // When & Then
+            mockMvc.perform(get("/restaurants/{restaurant-id}/orders/{order-id}", restaurantId, nonExistentOrderId))
+                    .andExpect(status().isNotFound());
+        }
+
+        @Test
+        @WithMockUser(username = "94b163a5-db57-4bfa-8ffd-051f22cd3c2c")
+        @DisplayName("Deve retornar 404 Not Found ao tentar buscar pedido de outro usuário")
+        void deveRetornarNotFoundAoBuscarPedidoDeOutroUsuario() throws Exception {
+            // Given
+            var savedOrder = createOrderInDatabase(StatusOrder.DRAFT, USER_ID);
+
+            // When & Then
+            mockMvc.perform(get("/restaurants/{restaurant-id}/orders/{order-id}", savedOrder.getRestaurantId(), savedOrder.getId()))
+                    .andExpect(status().isNotFound());
+        }
     }
 
     @Nested
@@ -137,8 +181,8 @@ class OrderRestControllerIT {
 
         @Test
         @WithMockUser(username = "94b163a5-db57-4bfa-8ffd-051f22cd3c2c")
-        @DisplayName("Deve retornar 404 Not Found ao tentar confirmar pedido de outro usuário")
-        void deveRetornarNotFoundAoConfirmarPedidoDeOutroUsuario() throws Exception {
+        @DisplayName("Deve retornar 403 Forbidden ao tentar confirmar pedido de outro usuário")
+        void deveRetornarForbiddenAoConfirmarPedidoDeOutroUsuario() throws Exception {
             // Given
             var savedOrder = createOrderInDatabase(StatusOrder.DRAFT, USER_ID);
 
@@ -151,7 +195,7 @@ class OrderRestControllerIT {
         @Test
         @WithMockUser(username = USER_ID)
         @DisplayName("Deve retornar 422 Unprocessable Content ao tentar confirmar um pedido já pago (PAYED)")
-        void deveRetornarBadRequestAoConfirmarPedidoPago() throws Exception {
+        void deveRetornarUnprocessableContentAoConfirmarPedidoPago() throws Exception {
             // Given
             var savedOrder = createOrderInDatabase(StatusOrder.PAYED, USER_ID);
 
@@ -164,7 +208,7 @@ class OrderRestControllerIT {
         @Test
         @WithMockUser(username = USER_ID)
         @DisplayName("Deve retornar 422 Unprocessable Content ao tentar confirmar um pedido com pagamento pendente (PENDING_PAY)")
-        void deveRetornarBadRequestAoConfirmarPedidoComPagamentoPendente() throws Exception {
+        void deveRetornarUnprocessableContentAoConfirmarPedidoComPagamentoPendente() throws Exception {
             // Given
             var savedOrder = createOrderInDatabase(StatusOrder.PENDING_PAY, USER_ID);
 

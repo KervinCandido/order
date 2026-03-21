@@ -11,6 +11,11 @@ import java.util.UUID;
 
 public class Order {
 
+    public static final String VIEW_ORDER = "VIEW_ORDER";
+    public static final String VIEW_ALL_ORDER = "VIEW_ALL_ORDER";
+    public static final String CANCEL_ORDER = "CANCEL_ORDER";
+    public static final String REVERSE_ORDER = "REVERSE_ORDER";
+
     private final Long id;
     private final Long restaurantId;
     private final UUID customerUuid;

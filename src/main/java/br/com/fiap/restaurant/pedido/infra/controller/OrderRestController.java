@@ -48,7 +48,19 @@ public class OrderRestController {
         return ResponseEntity.noContent().build();
     }
 
-    // TODO  Consultar pedido por ID.
+    @Operation(summary = "Buscar um pedido pelo order id", description = "Busca um pedido pelo identificador do pedido informado")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Pedido encontrado"),
+        @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
+    })
+    @GetMapping("/{order-id}")
+    public ResponseEntity<OrderResponse> findById(@PathVariable("order-id") Long orderId) {
+        return orderController.findById(orderId)
+                .map(OrderResponse::new)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
     // TODO  Consultar todos os pedidos associados ao cliente autenticado.
     // TODO Alterar enquanto em draft
 }

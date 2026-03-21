@@ -5,4 +5,5 @@ import java.util.UUID;
 
 public interface LoggedUserGateway {
     Optional<UUID> getCurrentUser();
+    boolean hasRole(String roleName);
 }
