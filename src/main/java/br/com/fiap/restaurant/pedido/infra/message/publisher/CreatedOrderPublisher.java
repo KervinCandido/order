@@ -14,14 +14,14 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 @Component
-public class ConfirmOrderPublisher implements PublisherGateway <Order> {
+public class CreatedOrderPublisher implements PublisherGateway <Order> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfirmOrderPublisher.class);
+    private static final Logger logger = LoggerFactory.getLogger(CreatedOrderPublisher.class);
     public static final String CONFIRM_ORDER_EVENT_TYPE = "order.confirm";
 
     private final RabbitTemplate rabbitTemplate;
 
-    public ConfirmOrderPublisher(RabbitTemplate rabbitTemplate) {
+    public CreatedOrderPublisher(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = Objects.requireNonNull(rabbitTemplate, "rabbitTemplate cannot be null");
     }
 

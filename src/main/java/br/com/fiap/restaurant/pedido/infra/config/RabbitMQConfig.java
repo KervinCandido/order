@@ -12,18 +12,18 @@ import org.springframework.context.annotation.Configuration;
 public class RabbitMQConfig {
 
     public static final String EXCHANGE_NAME = "ex.order";
-    public static final String CONFIRM_ORDER_QUEUE = "payment.order.confirm";
+    public static final String CREATED_ORDER_QUEUE = "payment.order.created";
 
-    public static final String CONFIRM_ORDER_ROUTING_KEY = "order.config";
+    public static final String CONFIRM_ORDER_ROUTING_KEY = "order.created";
 
     /*Consumer*/
-    public static final String RESTAURANT_CREATE_QUEUE = "order.restaurant.create";
-    public static final String RESTAURANT_UPDATE_QUEUE = "order.restaurant.update";
-    public static final String RESTAURANT_DELETE_QUEUE = "order.restaurant.delete";
+    public static final String RESTAURANT_CREATE_QUEUE = "order.restaurant.created";
+    public static final String RESTAURANT_UPDATE_QUEUE = "order.restaurant.updated";
+    public static final String RESTAURANT_DELETE_QUEUE = "order.restaurant.deleted";
 
-    public static final String MENU_ITEM_CREATE_QUEUE = "order.menuitem.create";
-    public static final String MENU_ITEM_UPDATE_QUEUE = "order.menuitem.update";
-    public static final String MENU_ITEM_DELETE_QUEUE = "order.menuitem.delete";
+    public static final String MENU_ITEM_CREATE_QUEUE = "order.menuitem.created";
+    public static final String MENU_ITEM_UPDATE_QUEUE = "order.menuitem.updated";
+    public static final String MENU_ITEM_DELETE_QUEUE = "order.menuitem.deleted";
 
     public static final String ORDER_PAYMENT_APPROVED = "order.payment.approved";
     public static final String ORDER_PAYMENT_PENDING = "order.payment.pending";
@@ -33,13 +33,13 @@ public class RabbitMQConfig {
         return new DirectExchange(EXCHANGE_NAME);
     }
 
-    @Bean("confirmOrderQueue")
-    public Queue confirmOrderQueue() {
-        return QueueBuilder.durable(CONFIRM_ORDER_QUEUE).quorum().build();
+    @Bean("createdOrderQueue")
+    public Queue createdOrderQueue() {
+        return QueueBuilder.durable(CREATED_ORDER_QUEUE).quorum().build();
     }
 
     @Bean
-    public Binding binding(@Qualifier("confirmOrderQueue") Queue queue, @Qualifier("orderExchange") DirectExchange directExchange) {
+    public Binding binding(@Qualifier("createdOrderQueue") Queue queue, @Qualifier("orderExchange") DirectExchange directExchange) {
         return BindingBuilder.bind(queue).to(directExchange).with(CONFIRM_ORDER_ROUTING_KEY);
     }
 

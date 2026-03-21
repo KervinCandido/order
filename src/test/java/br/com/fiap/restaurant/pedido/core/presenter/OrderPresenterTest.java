@@ -38,7 +38,7 @@ class OrderPresenterTest {
                     UUID.randomUUID(),
                     List.of(orderItem1, orderItem2),
                     LocalDateTime.now(),
-                    StatusOrder.CREATED
+                    StatusOrder.DRAFT
             );
             var expectedTotal = new BigDecimal("61.00");
 

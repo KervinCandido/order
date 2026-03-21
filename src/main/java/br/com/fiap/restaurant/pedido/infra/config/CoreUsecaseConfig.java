@@ -10,7 +10,7 @@ import br.com.fiap.restaurant.pedido.core.usecase.order.ConfirmOrderUseCase;
 import br.com.fiap.restaurant.pedido.core.usecase.order.CreateOrderUsecase;
 import br.com.fiap.restaurant.pedido.core.usecase.order.PayOrderUseCase;
 import br.com.fiap.restaurant.pedido.core.usecase.order.PendingOrderUseCase;
-import br.com.fiap.restaurant.pedido.infra.message.publisher.ConfirmOrderPublisher;
+import br.com.fiap.restaurant.pedido.infra.message.publisher.CreatedOrderPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -38,8 +38,8 @@ public class CoreUsecaseConfig {
     }
 
     @Bean
-    ConfirmOrderUseCase confirmOrderUseCase(LoggedUserGateway loggedUserGateway, OrderGateway orderGateway, ConfirmOrderPublisher confirmOrderPublisher) {
-        return new ConfirmOrderUseCase(loggedUserGateway, orderGateway, confirmOrderPublisher);
+    ConfirmOrderUseCase confirmOrderUseCase(LoggedUserGateway loggedUserGateway, OrderGateway orderGateway, CreatedOrderPublisher createdOrderPublisher) {
+        return new ConfirmOrderUseCase(loggedUserGateway, orderGateway, createdOrderPublisher);
     }
 
     @Bean

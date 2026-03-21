@@ -66,7 +66,7 @@ class OrderGatewayAdapterIT {
             var menuItemMiniPizza = new MenuItem(miniPizza.getId(), miniPizza.getName(), miniPizza.getUnitPrice(), miniPizza.isRestaurantOnly(), miniPizza.getRestaurantId());
             var orderItemHamburger = new OrderItem(menuItemHamburger, new BigDecimal("2"));
             var orderItemMiniPizza = new OrderItem(menuItemMiniPizza, new BigDecimal("2"));
-            var order = new Order(null, 1L, UUID.randomUUID(), List.of(orderItemHamburger, orderItemMiniPizza), LocalDateTime.now(), StatusOrder.CREATED);
+            var order = new Order(null, 1L, UUID.randomUUID(), List.of(orderItemHamburger, orderItemMiniPizza), LocalDateTime.now(), StatusOrder.DRAFT);
 
             // When
             Order savedOrder = orderGatewayAdapter.save(order);
@@ -93,7 +93,7 @@ class OrderGatewayAdapterIT {
             var orderEntity = new OrderEntity();
             orderEntity.setCustomerUuid(UUID.randomUUID());
             orderEntity.setRestaurantId(1L);
-            orderEntity.setStatusOrder(StatusOrder.CREATED);
+            orderEntity.setStatusOrder(StatusOrder.DRAFT);
             orderEntity.setOrderDateTime(LocalDateTime.now());
             orderEntity.setOrderItems(List.of());
             var savedEntity = orderRepository.save(orderEntity);

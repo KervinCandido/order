@@ -46,7 +46,7 @@ class PayOrderUseCaseTest {
         void devePagarUmPedidoComSucesso() {
             // Given
             var orderId = 1L;
-            var order = new Order(orderId, 1L, UUID.randomUUID(), new ArrayList<>(), LocalDateTime.now(), StatusOrder.APPROVED);
+            var order = new Order(orderId, 1L, UUID.randomUUID(), new ArrayList<>(), LocalDateTime.now(), StatusOrder.CREATED);
             given(orderGateway.findById(orderId)).willReturn(Optional.of(order));
 
             // When
@@ -79,7 +79,7 @@ class PayOrderUseCaseTest {
             // Given
             var orderId = 1L;
             // Um pedido com status CREATED não pode ser pago diretamente
-            var order = new Order(orderId, 1L, UUID.randomUUID(), new ArrayList<>(), LocalDateTime.now(), StatusOrder.CREATED);
+            var order = new Order(orderId, 1L, UUID.randomUUID(), new ArrayList<>(), LocalDateTime.now(), StatusOrder.DRAFT);
             given(orderGateway.findById(orderId)).willReturn(Optional.of(order));
 
             // When & Then

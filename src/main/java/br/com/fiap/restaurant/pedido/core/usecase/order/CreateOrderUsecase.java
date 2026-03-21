@@ -59,7 +59,7 @@ public class CreateOrderUsecase {
         var menuItems = orderItemsInput.parallelStream()
                 .map(oii -> new OrderItem(itemsMaps.get(oii.menuItemId()), oii.quantity())).toList();
 
-        var order = new Order(null, input.restaurantId(), customerUuid, menuItems, orderDateTime, StatusOrder.CREATED);
+        var order = new Order(null, input.restaurantId(), customerUuid, menuItems, orderDateTime, StatusOrder.DRAFT);
         return orderGateway.save(order);
     }
 }

@@ -14,8 +14,8 @@ class StatusOrderTest {
         // Act & Assert
         assertThat(StatusOrder.values())
                 .containsExactlyInAnyOrder(
+                        StatusOrder.DRAFT,
                         StatusOrder.CREATED,
-                        StatusOrder.APPROVED,
                         StatusOrder.PENDING_PAY,
                         StatusOrder.PAYED
                 );
@@ -25,8 +25,8 @@ class StatusOrderTest {
     @DisplayName("Deve retornar o nome correto para cada valor do enum")
     void deveRetornarNomeCorretoParaCadaValor() {
         // Act & Assert
+        assertThat(StatusOrder.DRAFT.name()).isEqualTo("DRAFT");
         assertThat(StatusOrder.CREATED.name()).isEqualTo("CREATED");
-        assertThat(StatusOrder.APPROVED.name()).isEqualTo("APPROVED");
         assertThat(StatusOrder.PENDING_PAY.name()).isEqualTo("PENDING_PAY");
         assertThat(StatusOrder.PAYED.name()).isEqualTo("PAYED");
     }
@@ -35,8 +35,8 @@ class StatusOrderTest {
     @DisplayName("Deve ser possível obter o valor do enum a partir de uma string")
     void deveObterValorDoEnumAPartirDeString() {
         // Act & Assert
+        assertThat(StatusOrder.valueOf("DRAFT")).isEqualTo(StatusOrder.DRAFT);
         assertThat(StatusOrder.valueOf("CREATED")).isEqualTo(StatusOrder.CREATED);
-        assertThat(StatusOrder.valueOf("APPROVED")).isEqualTo(StatusOrder.APPROVED);
         assertThat(StatusOrder.valueOf("PENDING_PAY")).isEqualTo(StatusOrder.PENDING_PAY);
         assertThat(StatusOrder.valueOf("PAYED")).isEqualTo(StatusOrder.PAYED);
     }

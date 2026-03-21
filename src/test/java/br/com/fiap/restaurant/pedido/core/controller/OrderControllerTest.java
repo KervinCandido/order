@@ -58,7 +58,7 @@ class OrderControllerTest {
         void deveCriarPedidoERetornarOutput() {
             // Given
             var input = new CreateOrderInput(1L, List.of(new OrderItemInput(1L, BigDecimal.ONE)));
-            var order = new Order(1L, 1L, UUID.randomUUID(), new ArrayList<>(), LocalDateTime.now(), StatusOrder.CREATED);
+            var order = new Order(1L, 1L, UUID.randomUUID(), new ArrayList<>(), LocalDateTime.now(), StatusOrder.DRAFT);
             given(createOrderUsecase.create(input)).willReturn(order);
 
             // When

@@ -84,7 +84,7 @@ class CreateOrderUsecaseTest {
             assertThat(result).isEqualTo(capturedOrder);
             assertThat(capturedOrder.getRestaurantId()).isEqualTo(restaurantId);
             assertThat(capturedOrder.getCustomerUuid()).isEqualTo(customerUuid);
-            assertThat(capturedOrder.getStatus()).isEqualTo(StatusOrder.CREATED);
+            assertThat(capturedOrder.getStatus()).isEqualTo(StatusOrder.DRAFT);
             assertThat(capturedOrder.getItems()).hasSize(2);
             assertThat(capturedOrder.getItems().getFirst().getMenuItem().getId()).isEqualTo(menuItem1.getId());
             assertThat(capturedOrder.getItems().getFirst().getQuantity()).isEqualTo(orderItemInput1.quantity());

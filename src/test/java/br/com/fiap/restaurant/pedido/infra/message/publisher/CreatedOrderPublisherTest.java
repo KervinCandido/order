@@ -28,19 +28,19 @@ import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Testes para o publisher ConfirmOrderPublisher")
-class ConfirmOrderPublisherTest {
+class CreatedOrderPublisherTest {
 
     @Mock
     private RabbitTemplate rabbitTemplate;
 
-    private ConfirmOrderPublisher confirmOrderPublisher;
+    private CreatedOrderPublisher createdOrderPublisher;
 
     @Captor
     private ArgumentCaptor<EventDTO<OrderDTO>> eventDTOCaptor;
 
     @BeforeEach
     void setUp() {
-        confirmOrderPublisher = new ConfirmOrderPublisher(rabbitTemplate);
+        createdOrderPublisher = new CreatedOrderPublisher(rabbitTemplate);
     }
 
     @Nested
@@ -51,10 +51,10 @@ class ConfirmOrderPublisherTest {
         @DisplayName("Deve publicar um evento de confirmação de pedido com sucesso")
         void devePublicarEventoDeConfirmacaoComSucesso() throws Exception {
             // Given
-            var order = new Order(1L, 1L, UUID.randomUUID(), new ArrayList<>(), LocalDateTime.now(), StatusOrder.APPROVED);
+            var order = new Order(1L, 1L, UUID.randomUUID(), new ArrayList<>(), LocalDateTime.now(), StatusOrder.CREATED);
 
             // When
-            CompletableFuture<Void> future = confirmOrderPublisher.publish(order);
+            CompletableFuture<Void> future = createdOrderPublisher.publish(order);
             future.get(5, TimeUnit.SECONDS); // Aguarda a conclusão do CompletableFuture
 
             // Then
@@ -65,7 +65,7 @@ class ConfirmOrderPublisherTest {
             );
 
             EventDTO<OrderDTO> capturedEvent = eventDTOCaptor.getValue();
-            assertThat(capturedEvent.type()).isEqualTo(ConfirmOrderPublisher.CONFIRM_ORDER_EVENT_TYPE);
+            assertThat(capturedEvent.type()).isEqualTo(CreatedOrderPublisher.CONFIRM_ORDER_EVENT_TYPE);
             assertThat(capturedEvent.body().id()).isEqualTo(order.getId());
             assertThat(capturedEvent.body().customerUuid()).isEqualTo(order.getCustomerUuid());
         }
@@ -79,7 +79,7 @@ class ConfirmOrderPublisherTest {
         @DisplayName("Deve lançar NullPointerException se RabbitTemplate for nulo")
         void deveLancarExcecaoSeRabbitTemplateForNulo() {
             // When & Then
-            assertThatThrownBy(() -> new ConfirmOrderPublisher(null))
+            assertThatThrownBy(() -> new CreatedOrderPublisher(null))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessageContaining("rabbitTemplate cannot be null");
         }

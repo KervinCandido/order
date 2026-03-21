@@ -46,7 +46,7 @@ class OrderTest {
         void deveCriarPedidoComSucesso() {
             // Arrange
             var id = 1L;
-            var status = StatusOrder.CREATED;
+            var status = StatusOrder.DRAFT;
 
             // Act
             var order = new Order(id, restaurantId, customerUuid, items, orderDateTime, status);
@@ -63,7 +63,7 @@ class OrderTest {
         @Test
         @DisplayName("Deve lançar exceção quando o ID do restaurante for nulo")
         void deveLancarExcecaoQuandoRestaurantIdForNulo() {
-            assertThatThrownBy(() -> new Order(1L, null, customerUuid, items, orderDateTime, StatusOrder.CREATED))
+            assertThatThrownBy(() -> new Order(1L, null, customerUuid, items, orderDateTime, StatusOrder.DRAFT))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessage("restaurantId cannot be null.");
         }
@@ -71,7 +71,7 @@ class OrderTest {
         @Test
         @DisplayName("Deve lançar exceção quando o UUID do cliente for nulo")
         void deveLancarExcecaoQuandoCustomerUuidForNulo() {
-            assertThatThrownBy(() -> new Order(1L, restaurantId, null, items, orderDateTime, StatusOrder.CREATED))
+            assertThatThrownBy(() -> new Order(1L, restaurantId, null, items, orderDateTime, StatusOrder.DRAFT))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessage("customerUuid cannot be null.");
         }
@@ -79,7 +79,7 @@ class OrderTest {
         @Test
         @DisplayName("Deve lançar exceção quando a lista de itens for nula")
         void deveLancarExcecaoQuandoItemsForNulo() {
-            assertThatThrownBy(() -> new Order(1L, restaurantId, customerUuid, null, orderDateTime, StatusOrder.CREATED))
+            assertThatThrownBy(() -> new Order(1L, restaurantId, customerUuid, null, orderDateTime, StatusOrder.DRAFT))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessage("items cannot be null.");
         }
@@ -87,7 +87,7 @@ class OrderTest {
         @Test
         @DisplayName("Deve lançar exceção quando a data e hora do pedido for nula")
         void deveLancarExcecaoQuandoOrderDateTimeForNulo() {
-            assertThatThrownBy(() -> new Order(1L, restaurantId, customerUuid, items, null, StatusOrder.CREATED))
+            assertThatThrownBy(() -> new Order(1L, restaurantId, customerUuid, items, null, StatusOrder.DRAFT))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessage("orderDateTime cannot be null.");
         }
@@ -109,20 +109,20 @@ class OrderTest {
         @DisplayName("Deve confirmar o pedido mudando o status de CREATED para APPROVED")
         void deveConfirmarPedido() {
             // Arrange
-            var order = new Order(1L, restaurantId, customerUuid, items, orderDateTime, StatusOrder.CREATED);
+            var order = new Order(1L, restaurantId, customerUuid, items, orderDateTime, StatusOrder.DRAFT);
 
             // Act
             order.confirm();
 
             // Assert
-            assertThat(order.getStatus()).isEqualTo(StatusOrder.APPROVED);
+            assertThat(order.getStatus()).isEqualTo(StatusOrder.CREATED);
         }
 
         @Test
         @DisplayName("Deve lançar exceção ao tentar confirmar um pedido que não está com status CREATED")
         void deveLancarExcecaoAoConfirmarPedidoComStatusIncorreto() {
             // Arrange
-            var order = new Order(1L, restaurantId, customerUuid, items, orderDateTime, StatusOrder.APPROVED);
+            var order = new Order(1L, restaurantId, customerUuid, items, orderDateTime, StatusOrder.CREATED);
 
             // Act & Assert
             assertThatThrownBy(order::confirm)
@@ -134,7 +134,7 @@ class OrderTest {
         @DisplayName("Deve alterar o status para PENDING_PAY quando o pedido está APPROVED")
         void deveAlterarStatusParaPendenteDePagamento() {
             // Arrange
-            var order = new Order(1L, restaurantId, customerUuid, items, orderDateTime, StatusOrder.APPROVED);
+            var order = new Order(1L, restaurantId, customerUuid, items, orderDateTime, StatusOrder.CREATED);
 
             // Act
             order.pendingPay();
@@ -147,7 +147,7 @@ class OrderTest {
         @DisplayName("Deve lançar exceção ao tentar alterar para PENDING_PAY com status diferente de APPROVED")
         void deveLancarExcecaoAoMudarParaPendenteDePagamentoComStatusIncorreto() {
             // Arrange
-            var order = new Order(1L, restaurantId, customerUuid, items, orderDateTime, StatusOrder.CREATED);
+            var order = new Order(1L, restaurantId, customerUuid, items, orderDateTime, StatusOrder.DRAFT);
 
             // Act & Assert
             assertThatThrownBy(order::pendingPay)
@@ -159,7 +159,7 @@ class OrderTest {
         @DisplayName("Deve alterar o status para PAYED quando o pedido está APPROVED")
         void devePagarPedido() {
             // Arrange
-            var order = new Order(1L, restaurantId, customerUuid, items, orderDateTime, StatusOrder.APPROVED);
+            var order = new Order(1L, restaurantId, customerUuid, items, orderDateTime, StatusOrder.CREATED);
 
             // Act
             order.pay();
@@ -185,7 +185,7 @@ class OrderTest {
         @DisplayName("Deve lançar exceção ao tentar pagar um pedido com status diferente de APPROVED")
         void deveLancarExcecaoAoPagarPedidoComStatusIncorreto() {
             // Arrange
-            var order = new Order(1L, restaurantId, customerUuid, items, orderDateTime, StatusOrder.CREATED);
+            var order = new Order(1L, restaurantId, customerUuid, items, orderDateTime, StatusOrder.DRAFT);
 
             // Act & Assert
             assertThatThrownBy(order::pay)
@@ -202,7 +202,7 @@ class OrderTest {
         @DisplayName("Deve adicionar um item ao pedido")
         void deveAdicionarItemAoPedido() {
             // Arrange
-            var order = new Order(1L, restaurantId, customerUuid, new ArrayList<>(), orderDateTime, StatusOrder.CREATED);
+            var order = new Order(1L, restaurantId, customerUuid, new ArrayList<>(), orderDateTime, StatusOrder.DRAFT);
             var newItem = new MenuItem(3L, "New Item", BigDecimal.TEN, false, restaurantId);
             var newOrderItem = new OrderItem(newItem, BigDecimal.ONE);
             int initialSize = order.getItems().size();
@@ -219,7 +219,7 @@ class OrderTest {
         @DisplayName("Deve retornar uma cópia da lista de itens para proteger o estado interno")
         void deveRetornarCopiaDaListaDeItens() {
             // Arrange
-            var order = new Order(1L, restaurantId, customerUuid, items, orderDateTime, StatusOrder.CREATED);
+            var order = new Order(1L, restaurantId, customerUuid, items, orderDateTime, StatusOrder.DRAFT);
             var itemsFromGetter = order.getItems();
             var newItem = new MenuItem(3L, "New Item", BigDecimal.TEN, false, restaurantId);
             var newOrderItem = new OrderItem(newItem, BigDecimal.ONE);
@@ -237,7 +237,7 @@ class OrderTest {
         @DisplayName("Deve calcular o total do pedido corretamente")
         void deveCalcularTotalDoPedido() {
             // Arrange
-            var order = new Order(1L, restaurantId, customerUuid, items, orderDateTime, StatusOrder.CREATED);
+            var order = new Order(1L, restaurantId, customerUuid, items, orderDateTime, StatusOrder.DRAFT);
             // Item 1: 10.00 * 1 = 10.00
             // Item 2: 20.00 * 2 = 40.00
             var expectedTotal = new BigDecimal("50.00");
