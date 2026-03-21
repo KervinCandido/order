@@ -5,10 +5,7 @@ import br.com.fiap.restaurant.pedido.core.controller.OrderController;
 import br.com.fiap.restaurant.pedido.core.usecase.menuitem.DeleteAllMenuItemsByRestaurantIdUsecase;
 import br.com.fiap.restaurant.pedido.core.usecase.menuitem.DeleteMenuItemUsecase;
 import br.com.fiap.restaurant.pedido.core.usecase.menuitem.SaveAllMenuItemsUsecase;
-import br.com.fiap.restaurant.pedido.core.usecase.order.ConfirmOrderUseCase;
-import br.com.fiap.restaurant.pedido.core.usecase.order.CreateOrderUsecase;
-import br.com.fiap.restaurant.pedido.core.usecase.order.PayOrderUseCase;
-import br.com.fiap.restaurant.pedido.core.usecase.order.PendingOrderUseCase;
+import br.com.fiap.restaurant.pedido.core.usecase.order.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,7 +23,8 @@ public class CoreControllersConfig {
     OrderController orderController(CreateOrderUsecase createOrderUsecase,
                                     ConfirmOrderUseCase confirmOrderUseCase,
                                     PendingOrderUseCase pendingOrderUseCase,
-                                    PayOrderUseCase payOrderUseCase) {
-        return new OrderController(createOrderUsecase, confirmOrderUseCase, pendingOrderUseCase, payOrderUseCase);
+                                    PayOrderUseCase payOrderUseCase,
+                                    FindOrderByIdUsecase findOrderByIdUsecase) {
+        return new OrderController(createOrderUsecase, confirmOrderUseCase, pendingOrderUseCase, payOrderUseCase, findOrderByIdUsecase);
     }
 }

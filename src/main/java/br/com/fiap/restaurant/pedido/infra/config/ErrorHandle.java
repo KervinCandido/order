@@ -58,6 +58,13 @@ public class ErrorHandle {
         return new SimpleErrorResponse(e.getMessage());
     }
 
+    @ApiResponse(responseCode = "401", description = "Usuário não autenticado", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SimpleErrorResponse.class)))
+    @ResponseStatus(code = HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(UserNotAuthenticatedException.class)
+    public SimpleErrorResponse handleUserNotAuthenticatedException(UserNotAuthenticatedException e) {
+        return new SimpleErrorResponse(e.getMessage());
+    }
+
     @ApiResponse(responseCode = "403", description = "Usuário não tem permissão para acessar este pedido", content = @Content(mediaType = "application/json", schema = @Schema(implementation = SimpleErrorResponse.class)))
     @ResponseStatus(code = HttpStatus.FORBIDDEN)
     @ExceptionHandler(OrderOwnershipException.class)

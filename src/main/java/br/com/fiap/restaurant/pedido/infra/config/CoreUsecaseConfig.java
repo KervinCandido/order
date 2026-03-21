@@ -6,10 +6,7 @@ import br.com.fiap.restaurant.pedido.core.gateway.OrderGateway;
 import br.com.fiap.restaurant.pedido.core.usecase.menuitem.DeleteAllMenuItemsByRestaurantIdUsecase;
 import br.com.fiap.restaurant.pedido.core.usecase.menuitem.DeleteMenuItemUsecase;
 import br.com.fiap.restaurant.pedido.core.usecase.menuitem.SaveAllMenuItemsUsecase;
-import br.com.fiap.restaurant.pedido.core.usecase.order.ConfirmOrderUseCase;
-import br.com.fiap.restaurant.pedido.core.usecase.order.CreateOrderUsecase;
-import br.com.fiap.restaurant.pedido.core.usecase.order.PayOrderUseCase;
-import br.com.fiap.restaurant.pedido.core.usecase.order.PendingOrderUseCase;
+import br.com.fiap.restaurant.pedido.core.usecase.order.*;
 import br.com.fiap.restaurant.pedido.infra.message.publisher.CreatedOrderPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,5 +47,10 @@ public class CoreUsecaseConfig {
     @Bean
     PayOrderUseCase payOrderUseCase(OrderGateway orderGateway) {
         return new PayOrderUseCase(orderGateway);
+    }
+
+    @Bean
+    FindOrderByIdUsecase findOrderByIdUsecase(LoggedUserGateway loggedUserGateway, OrderGateway orderGateway) {
+        return new FindOrderByIdUsecase(loggedUserGateway, orderGateway);
     }
 }

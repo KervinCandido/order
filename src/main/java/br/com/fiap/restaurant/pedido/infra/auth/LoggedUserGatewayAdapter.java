@@ -5,6 +5,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -17,6 +18,15 @@ public class LoggedUserGatewayAdapter implements LoggedUserGateway {
         if (auth == null || !auth.isAuthenticated() || auth.getName() == null) return Optional.empty();
 
         return Optional.of(UUID.fromString(auth.getName()));
+    }
+
+    @Override
+    public boolean hasRole(String roleName) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) return false;
+        return auth.getAuthorities()
+                .stream()
+                .anyMatch(a -> Objects.equals(a.getAuthority(), roleName));
     }
 
 }
