@@ -2,9 +2,11 @@ package br.com.fiap.restaurant.pedido.core.controller;
 
 import br.com.fiap.restaurant.pedido.core.domain.Order;
 import br.com.fiap.restaurant.pedido.core.domain.StatusOrder;
+import br.com.fiap.restaurant.pedido.core.domain.pagination.Page;
 import br.com.fiap.restaurant.pedido.core.inbound.CreateOrderInput;
 import br.com.fiap.restaurant.pedido.core.inbound.OrderItemInput;
 import br.com.fiap.restaurant.pedido.core.outbound.OrderOutput;
+import br.com.fiap.restaurant.pedido.core.presenter.OrderPresenter;
 import br.com.fiap.restaurant.pedido.core.usecase.order.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,11 +21,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static br.com.fiap.restaurant.pedido.core.controller.OrderController.ORDER_ID_CANNOT_BE_NULL_MESSAGE;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
@@ -32,21 +34,13 @@ import static org.mockito.BDDMockito.then;
 class OrderControllerTest {
 
     @Mock
-    private CreateOrderUsecase createOrderUsecase;
-    @Mock
-    private ConfirmOrderUseCase confirmOrderUseCase;
-    @Mock
-    private PendingOrderUseCase pendingOrderUseCase;
-    @Mock
-    private PayOrderUseCase payOrderUseCase;
-    @Mock
-    private FindOrderByIdUsecase findOrderByIdUsecase;
+    private OrderUsecaseFacade orderUsecaseFacade;
 
     private OrderController orderController;
 
     @BeforeEach
     void setUp() {
-        orderController = new OrderController(createOrderUsecase, confirmOrderUseCase, pendingOrderUseCase, payOrderUseCase, findOrderByIdUsecase);
+        orderController = new OrderController(orderUsecaseFacade);
     }
 
     @Nested
@@ -59,13 +53,13 @@ class OrderControllerTest {
             // Given
             var orderId = 1L;
             var order = new Order(orderId, 1L, UUID.randomUUID(), new ArrayList<>(), LocalDateTime.now(), StatusOrder.DRAFT);
-            given(findOrderByIdUsecase.findById(orderId)).willReturn(Optional.of(order));
+            given(orderUsecaseFacade.findOrderById(orderId)).willReturn(Optional.of(order));
 
             // When
             Optional<OrderOutput> result = orderController.findById(orderId);
 
             // Then
-            then(findOrderByIdUsecase).should().findById(orderId);
+            then(orderUsecaseFacade).should().findOrderById(orderId);
             assertThat(result).isPresent();
             assertThat(result.get().id()).isEqualTo(orderId);
         }
@@ -75,13 +69,13 @@ class OrderControllerTest {
         void dadoUmIdDePedidoInexistente_quandoBuscarPorId_entaoDeveRetornarOptionalVazio() {
             // Given
             var orderId = 1L;
-            given(findOrderByIdUsecase.findById(orderId)).willReturn(Optional.empty());
+            given(orderUsecaseFacade.findOrderById(orderId)).willReturn(Optional.empty());
 
             // When
             Optional<OrderOutput> result = orderController.findById(orderId);
 
             // Then
-            then(findOrderByIdUsecase).should().findById(orderId);
+            then(orderUsecaseFacade).should().findOrderById(orderId);
             assertThat(result).isEmpty();
         }
 
@@ -92,7 +86,68 @@ class OrderControllerTest {
             assertThatThrownBy(() -> orderController.findById(null))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessage(ORDER_ID_CANNOT_BE_NULL_MESSAGE);
-            then(findOrderByIdUsecase).shouldHaveNoInteractions();
+            then(orderUsecaseFacade).shouldHaveNoInteractions();
+        }
+    }
+
+    @Nested
+    @DisplayName("Busca de Pedidos por Usuário Atual")
+    class FindOrderByCurrentUser {
+
+        private Order order;
+
+        @BeforeEach
+        void setUp() {
+            this.order = new Order(1L, 1L, UUID.randomUUID(), new ArrayList<>(), LocalDateTime.now(), StatusOrder.DRAFT);
+        }
+
+        @Test
+        @DisplayName("Deve retornar a página de pedidos quando o status for informado")
+        void deveRetornarPaginaDePedidosQuandoStatusInformado() {
+            // Given
+            var status = Set.of(StatusOrder.DRAFT);
+            var pageNumber = 0;
+            var pageSize = 10;
+            var page = new Page<>(pageNumber, pageSize, 1, List.of(order));
+            var outputPage = new Page<>(pageNumber, pageSize, 1, List.of(OrderPresenter.toOutput(order)));
+            given(orderUsecaseFacade.findOrderByCurrentUser(status, pageNumber, pageSize)).willReturn(page);
+
+            // When
+            var result = orderController.findOrderByCurrentUser(status, pageNumber, pageSize);
+
+            // Then
+            then(orderUsecaseFacade).should().findOrderByCurrentUser(status, pageNumber, pageSize);
+            assertThat(result).isNotNull();
+            assertThat(result.pageNumber()).isEqualTo(pageNumber);
+            assertThat(result.pageSize()).isEqualTo(pageSize);
+            assertThat(result.totalElements()).isOne();
+            assertThat(result.totalPages()).isOne();
+            assertThat(result.content()).isNotNull().hasSize(1);
+            assertThat(result).isEqualTo(outputPage);
+        }
+
+        @Test
+        @DisplayName("Deve retornar a página de pedidos com status vazio quando o status for null")
+        void deveRetornarPaginaDePedidosComStatusVazioQuandoStatusVazio() {
+            // Given
+            var pageNumber = 0;
+            var pageSize = 10;
+            var page = new Page<>(pageNumber, pageSize, 1, List.of(order));
+            var outputPage = new Page<>(pageNumber, pageSize, 1, List.of(OrderPresenter.toOutput(order)));
+            given(orderUsecaseFacade.findOrderByCurrentUser(Set.of(), pageNumber, pageSize)).willReturn(page);
+
+            // When
+            var result = orderController.findOrderByCurrentUser(null, pageNumber, pageSize);
+
+            // Then
+            then(orderUsecaseFacade).should().findOrderByCurrentUser(Set.of(), pageNumber, pageSize);
+            assertThat(result).isNotNull();
+            assertThat(result.pageNumber()).isEqualTo(pageNumber);
+            assertThat(result.pageSize()).isEqualTo(pageSize);
+            assertThat(result.totalElements()).isOne();
+            assertThat(result.totalPages()).isOne();
+            assertThat(result.content()).isNotNull().hasSize(1);
+            assertThat(result).isEqualTo(outputPage);
         }
     }
 
@@ -106,13 +161,13 @@ class OrderControllerTest {
             // Given
             var input = new CreateOrderInput(1L, List.of(new OrderItemInput(1L, BigDecimal.ONE)));
             var order = new Order(1L, 1L, UUID.randomUUID(), new ArrayList<>(), LocalDateTime.now(), StatusOrder.DRAFT);
-            given(createOrderUsecase.create(input)).willReturn(order);
+            given(orderUsecaseFacade.createOrder(input)).willReturn(order);
 
             // When
             OrderOutput result = orderController.create(input);
 
             // Then
-            then(createOrderUsecase).should().create(input);
+            then(orderUsecaseFacade).should().createOrder(input);
             assertThat(result).isNotNull();
             assertThat(result.id()).isEqualTo(order.getId());
         }
@@ -124,7 +179,7 @@ class OrderControllerTest {
             assertThatThrownBy(() -> orderController.create(null))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessage("createOrderInput cannot be null.");
-            then(createOrderUsecase).shouldHaveNoInteractions();
+            then(orderUsecaseFacade).shouldHaveNoInteractions();
         }
     }
 
@@ -142,7 +197,7 @@ class OrderControllerTest {
             orderController.confirm(orderId);
 
             // Then
-            then(confirmOrderUseCase).should().confirmOrderBy(orderId);
+            then(orderUsecaseFacade).should().confirmOrder(orderId);
         }
 
         @Test
@@ -152,7 +207,7 @@ class OrderControllerTest {
             assertThatThrownBy(() -> orderController.confirm(null))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessage(ORDER_ID_CANNOT_BE_NULL_MESSAGE);
-            then(confirmOrderUseCase).shouldHaveNoInteractions();
+            then(orderUsecaseFacade).shouldHaveNoInteractions();
         }
     }
 
@@ -170,7 +225,7 @@ class OrderControllerTest {
             orderController.payOrder(orderId);
 
             // Then
-            then(payOrderUseCase).should().payOrderById(orderId);
+            then(orderUsecaseFacade).should().payOrder(orderId);
         }
 
         @Test
@@ -180,7 +235,7 @@ class OrderControllerTest {
             assertThatThrownBy(() -> orderController.payOrder(null))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessage(ORDER_ID_CANNOT_BE_NULL_MESSAGE);
-            then(payOrderUseCase).shouldHaveNoInteractions();
+            then(orderUsecaseFacade).shouldHaveNoInteractions();
         }
     }
 
@@ -198,7 +253,7 @@ class OrderControllerTest {
             orderController.pendingPaymentOrder(orderId);
 
             // Then
-            then(pendingOrderUseCase).should().pendingOrderById(orderId);
+            then(orderUsecaseFacade).should().pendingOrder(orderId);
         }
 
         @Test
@@ -208,7 +263,7 @@ class OrderControllerTest {
             assertThatThrownBy(() -> orderController.pendingPaymentOrder(null))
                     .isInstanceOf(NullPointerException.class)
                     .hasMessage(ORDER_ID_CANNOT_BE_NULL_MESSAGE);
-            then(pendingOrderUseCase).shouldHaveNoInteractions();
+            then(orderUsecaseFacade).shouldHaveNoInteractions();
         }
     }
 
@@ -217,43 +272,11 @@ class OrderControllerTest {
     class ConstructorValidation {
 
         @Test
-        @DisplayName("Deve lançar exceção se CreateOrderUsecase for nulo")
-        void deveLancarExcecaoSeCreateOrderUsecaseForNulo() {
-            assertThatThrownBy(() -> new OrderController(null, confirmOrderUseCase, pendingOrderUseCase, payOrderUseCase, findOrderByIdUsecase))
+        @DisplayName("Deve lançar exceção se orderUsecaseFacade for nulo")
+        void deveLancarExcecaoSeOrderUsecaseFacadeForNulo() {
+            assertThatThrownBy(() -> new OrderController(null))
                     .isInstanceOf(NullPointerException.class)
-                    .hasMessage("createOrderUsecase cannot be null.");
-        }
-
-        @Test
-        @DisplayName("Deve lançar exceção se ConfirmOrderUseCase for nulo")
-        void deveLancarExcecaoSeConfirmOrderUseCaseForNulo() {
-            assertThatThrownBy(() -> new OrderController(createOrderUsecase, null, pendingOrderUseCase, payOrderUseCase, findOrderByIdUsecase))
-                    .isInstanceOf(NullPointerException.class)
-                    .hasMessage("confirmOrderUseCase cannot be null.");
-        }
-
-        @Test
-        @DisplayName("Deve lançar exceção se PendingOrderUseCase for nulo")
-        void deveLancarExcecaoSePendingOrderUseCaseForNulo() {
-            assertThatThrownBy(() -> new OrderController(createOrderUsecase, confirmOrderUseCase, null, payOrderUseCase, findOrderByIdUsecase))
-                    .isInstanceOf(NullPointerException.class)
-                    .hasMessage("pendingOrderUseCase cannot be null.");
-        }
-
-        @Test
-        @DisplayName("Deve lançar exceção se PayOrderUseCase for nulo")
-        void deveLancarExcecaoSePayOrderUseCaseForNulo() {
-            assertThatThrownBy(() -> new OrderController(createOrderUsecase, confirmOrderUseCase, pendingOrderUseCase, null, findOrderByIdUsecase))
-                    .isInstanceOf(NullPointerException.class)
-                    .hasMessage("payOrderUseCase cannot be null.");
-        }
-
-        @Test
-        @DisplayName("Deve lançar exceção se FindOrderByIdUsecase for nulo")
-        void deveLancarExcecaoSeFindOrderByIdUsecaseForNulo() {
-            assertThatThrownBy(() -> new OrderController(createOrderUsecase, confirmOrderUseCase, pendingOrderUseCase, payOrderUseCase, null))
-                    .isInstanceOf(NullPointerException.class)
-                    .hasMessage("findOrderByIdUsecase cannot be null.");
+                    .hasMessage("orderUsecaseFacade cannot be null.");
         }
     }
 }

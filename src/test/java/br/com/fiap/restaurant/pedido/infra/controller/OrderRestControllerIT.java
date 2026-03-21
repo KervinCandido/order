@@ -61,6 +61,8 @@ class OrderRestControllerIT {
     private CreatedOrderPublisher createdOrderPublisher;
 
     private static final String USER_ID = "a2c9a844-6d27-4817-8226-8b4309b65ef5";
+    private static final String OTHER_USER_ID = "94b163a5-db57-4bfa-8ffd-051f22cd3c2c";
+
 
     @BeforeEach
     void setup() {
@@ -108,7 +110,7 @@ class OrderRestControllerIT {
         }
 
         @Test
-        @WithMockUser(username = "94b163a5-db57-4bfa-8ffd-051f22cd3c2c")
+        @WithMockUser(username = OTHER_USER_ID)
         @DisplayName("Deve retornar 404 Not Found ao tentar buscar pedido de outro usuário")
         void deveRetornarNotFoundAoBuscarPedidoDeOutroUsuario() throws Exception {
             // Given
@@ -117,6 +119,113 @@ class OrderRestControllerIT {
             // When & Then
             mockMvc.perform(get("/restaurants/{restaurant-id}/orders/{order-id}", savedOrder.getRestaurantId(), savedOrder.getId()))
                     .andExpect(status().isNotFound());
+        }
+    }
+
+    @Nested
+    @DisplayName("Busca de Pedidos do Usuário Corrente")
+    class FindAllCurrentUserOrders {
+
+        @Test
+        @WithMockUser(username = USER_ID)
+        @DisplayName("Deve retornar pagina de pedidos do usuário logado")
+        void deveRetornarPaginaDePedidosDoUsuarioLogado() throws Exception {
+            // Given
+            createOrderInDatabase(StatusOrder.DRAFT, USER_ID);
+            createOrderInDatabase(StatusOrder.PAYED, USER_ID);
+            createOrderInDatabase(StatusOrder.DRAFT, OTHER_USER_ID);
+
+            // When & Then
+            mockMvc.perform(get("/restaurants/{restaurant-id}/orders", 1L))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content.length()").value(2))
+                    .andExpect(jsonPath("$.pageNumber").value(0))
+                    .andExpect(jsonPath("$.pageSize").value(10))
+                    .andExpect(jsonPath("$.totalElements").value(2));
+        }
+
+        @Test
+        @WithMockUser(username = USER_ID)
+        @DisplayName("Deve retornar pagina de pedidos com paginação customizada")
+        void deveRetornarPaginaDePedidosComPaginacaoCustomizada() throws Exception {
+            // Given
+            createOrderInDatabase(StatusOrder.DRAFT, USER_ID);
+            createOrderInDatabase(StatusOrder.PAYED, USER_ID);
+            createOrderInDatabase(StatusOrder.CREATED, USER_ID);
+
+            // When & Then
+            mockMvc.perform(get("/restaurants/{restaurant-id}/orders", 1L)
+                            .param("pageNumber", "1")
+                            .param("pageSize", "2"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content.length()").value(1))
+                    .andExpect(jsonPath("$.pageNumber").value(1))
+                    .andExpect(jsonPath("$.pageSize").value(2))
+                    .andExpect(jsonPath("$.totalElements").value(3))
+                    .andExpect(jsonPath("$.totalPages").value(2));
+        }
+
+        @Test
+        @WithMockUser(username = USER_ID)
+        @DisplayName("Deve retornar pagina de pedidos filtrando por status")
+        void deveRetornarPaginaDePedidosFiltrandoPorStatus() throws Exception {
+            // Given
+            createOrderInDatabase(StatusOrder.DRAFT, USER_ID);
+            createOrderInDatabase(StatusOrder.PAYED, USER_ID);
+
+            // When & Then
+            mockMvc.perform(get("/restaurants/{restaurant-id}/orders", 1L)
+                            .param("statusOrders", "PAYED"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content.length()").value(1))
+                    .andExpect(jsonPath("$.content[0].status").value("PAYED"))
+                    .andExpect(jsonPath("$.totalElements").value(1));
+        }
+
+        @Test
+        @WithMockUser(username = USER_ID)
+        @DisplayName("Deve retornar pagina de pedidos filtrando por múltiplos status")
+        void deveRetornarPaginaDePedidosFiltrandoPorMultiplosStatus() throws Exception {
+            // Given
+            createOrderInDatabase(StatusOrder.DRAFT, USER_ID);
+            createOrderInDatabase(StatusOrder.PAYED, USER_ID);
+            createOrderInDatabase(StatusOrder.CREATED, USER_ID);
+
+            // When & Then
+            mockMvc.perform(get("/restaurants/{restaurant-id}/orders", 1L)
+                            .param("statusOrders", "DRAFT,CREATED"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content.length()").value(2))
+                    .andExpect(jsonPath("$.totalElements").value(2));
+        }
+
+        @Test
+        @WithMockUser(username = USER_ID)
+        @DisplayName("Deve retornar pagina vazia quando não houver pedidos")
+        void deveRetornarPaginaVaziaQuandoNaoHouverPedidos() throws Exception {
+            // Given
+            createOrderInDatabase(StatusOrder.DRAFT, OTHER_USER_ID);
+
+            // When & Then
+            mockMvc.perform(get("/restaurants/{restaurant-id}/orders", 1L))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content.length()").value(0))
+                    .andExpect(jsonPath("$.totalElements").value(0));
+        }
+
+        @Test
+        @WithMockUser(username = USER_ID)
+        @DisplayName("Deve retornar pagina vazia quando não houver pedidos com status especificado")
+        void deveRetornarPaginaVaziaQuandoNaoHouverPedidosComStatusEspecificado() throws Exception {
+            // Given
+            createOrderInDatabase(StatusOrder.DRAFT, USER_ID);
+
+            // When & Then
+            mockMvc.perform(get("/restaurants/{restaurant-id}/orders", 1L)
+                            .param("statusOrders", "PAYED"))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content.length()").value(0))
+                    .andExpect(jsonPath("$.totalElements").value(0));
         }
     }
 
@@ -180,7 +289,7 @@ class OrderRestControllerIT {
         }
 
         @Test
-        @WithMockUser(username = "94b163a5-db57-4bfa-8ffd-051f22cd3c2c")
+        @WithMockUser(username = OTHER_USER_ID)
         @DisplayName("Deve retornar 403 Forbidden ao tentar confirmar pedido de outro usuário")
         void deveRetornarForbiddenAoConfirmarPedidoDeOutroUsuario() throws Exception {
             // Given

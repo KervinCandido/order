@@ -53,4 +53,28 @@ public class CoreUsecaseConfig {
     FindOrderByIdUsecase findOrderByIdUsecase(LoggedUserGateway loggedUserGateway, OrderGateway orderGateway) {
         return new FindOrderByIdUsecase(loggedUserGateway, orderGateway);
     }
+
+    @Bean
+    FindOrderByCurrentUserUsecase findOrderByCurrentUserUsecase(LoggedUserGateway loggedUserGateway, OrderGateway orderGateway) {
+        return new FindOrderByCurrentUserUsecase(loggedUserGateway, orderGateway);
+    }
+
+    @Bean
+    OrderUsecaseFacade orderUsecaseFacade(
+            PendingOrderUseCase pendingOrderUseCase,
+            ConfirmOrderUseCase confirmOrderUseCase,
+            CreateOrderUsecase createOrderUsecase,
+            PayOrderUseCase payOrderUseCase,
+            FindOrderByIdUsecase findOrderByIdUsecase,
+            FindOrderByCurrentUserUsecase findOrderByCurrentUserUsecase
+    ) {
+        return new OrderUsecaseFacade.Builder()
+                .pendingOrderUseCase(pendingOrderUseCase)
+                .confirmOrderUseCase(confirmOrderUseCase)
+                .createOrderUsecase(createOrderUsecase)
+                .payOrderUseCase(payOrderUseCase)
+                .findOrderByIdUsecase(findOrderByIdUsecase)
+                .findOrderByCurrentUserUsecase(findOrderByCurrentUserUsecase)
+                .build();
+    }
 }
