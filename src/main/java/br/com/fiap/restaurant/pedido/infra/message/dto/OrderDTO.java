@@ -17,7 +17,8 @@ public record OrderDTO (
     public OrderDTO(Order order) {
         this(order.getId(),
             order.getRestaurantId(),
-            order.getCustomerUuid(), order.getItems().stream().map(OrderItemDTO::new).toList(),
+            order.getCustomerUuid(),
+            order.getItems() == null ? List.of() : order.getItems().stream().map(OrderItemDTO::new).toList(),
             order.getOrderDateTime(),
             order.getStatus());
     }

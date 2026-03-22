@@ -13,6 +13,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -29,6 +30,7 @@ public class RestaurantConsumer {
     }
 
     @RabbitListener(queues = {RabbitMQConfig.RESTAURANT_CREATE_QUEUE})
+    @Transactional
     public void createRestaurant(EventDTO<RestaurantDTO> eventDTO, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
         try {
             logger.info("Consuming create restaurant event: {}", eventDTO);
@@ -43,6 +45,7 @@ public class RestaurantConsumer {
     }
 
     @RabbitListener(queues = {RabbitMQConfig.RESTAURANT_UPDATE_QUEUE})
+    @Transactional
     public void updateRestaurant(EventDTO<RestaurantDTO> eventDTO, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
         try {
             logger.info("Consuming update restaurant event: {}", eventDTO);
@@ -57,6 +60,7 @@ public class RestaurantConsumer {
     }
 
     @RabbitListener(queues = {RabbitMQConfig.RESTAURANT_DELETE_QUEUE})
+    @Transactional
     public void deleteRestaurant(EventDTO<RestaurantDTO> eventDTO, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long tag) throws IOException {
         try {
             logger.info("Consuming delete restaurant event: {}", eventDTO);
