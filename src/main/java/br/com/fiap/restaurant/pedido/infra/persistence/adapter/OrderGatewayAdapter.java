@@ -43,7 +43,7 @@ public class OrderGatewayAdapter implements OrderGateway {
     @Override
     public Page<Order> findByUser(UUID userUuid, int pageNumber, int pageSize) {
         Objects.requireNonNull(userUuid, "userUuid cannot be null");
-        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, "orderDateTime");
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.Direction.DESC, "orderDateTime");
         var ordersPage = orderRepository.findByCustomerUuid(userUuid, pageRequest);
 
         return new Page<>(
@@ -58,7 +58,7 @@ public class OrderGatewayAdapter implements OrderGateway {
     public Page<Order> findByUserAndStatus(UUID userUuid, Set<StatusOrder> orderStatus, int pageNumber, int pageSize) {
         Objects.requireNonNull(userUuid, "userUuid cannot be null");
 
-        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.Direction.ASC, "orderDateTime");
+        PageRequest pageRequest = PageRequest.of(pageNumber, pageSize, Sort.Direction.DESC, "orderDateTime");
         var ordersPage = orderRepository.findByCustomerUuidAndStatusOrderIn(userUuid, Objects.requireNonNullElse(orderStatus, Set.of()), pageRequest);
 
         return new Page<>(
