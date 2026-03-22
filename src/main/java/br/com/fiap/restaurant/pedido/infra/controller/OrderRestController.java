@@ -85,6 +85,4 @@ public class OrderRestController {
         var page = orderController.findOrderByCurrentUser(statusOrders, pageNumber, pageSize);
         return ResponseEntity.ok(page.mapItems(OrderResponse::new));
     }
-
-    // TODO Alterar enquanto em draft
 }
