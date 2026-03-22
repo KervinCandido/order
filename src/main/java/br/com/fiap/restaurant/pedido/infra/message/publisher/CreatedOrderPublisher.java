@@ -31,6 +31,6 @@ public class CreatedOrderPublisher implements PublisherGateway <Order> {
         EventDTO<OrderDTO> eventDTO = new EventDTO<>(CONFIRM_ORDER_EVENT_TYPE, orderDTO);
         logger.info("Publishing confirm order event: {}", eventDTO);
         return CompletableFuture.runAsync(() -> rabbitTemplate
-                .convertAndSend(RabbitMQConfig.EXCHANGE_NAME, RabbitMQConfig.CONFIRM_ORDER_ROUTING_KEY, eventDTO));
+                .convertAndSend(RabbitMQConfig.ORDER_EXCHANGE_NAME, RabbitMQConfig.CONFIRM_ORDER_ROUTING_KEY, eventDTO));
     }
 }

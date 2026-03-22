@@ -11,8 +11,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    public static final String EXCHANGE_NAME = "ex.order";
+    public static final String ORDER_EXCHANGE_NAME = "ex.order";
+    public static final String ORDER_DLX_EXCHANGE_NAME = "ex.order.dlx";
+    public static final String PAYMENT_DLX_EXCHANGE_NAME = "ex.payment.dlx";
     public static final String CREATED_ORDER_QUEUE = "payment.order.created";
+    public static final String CREATED_ORDER_QUEUE_DLQ = CREATED_ORDER_QUEUE + ".dlq";
 
     public static final String CONFIRM_ORDER_ROUTING_KEY = "order.created";
 
@@ -26,16 +29,37 @@ public class RabbitMQConfig {
     public static final String MENU_ITEM_DELETE_QUEUE = "order.menuitem.deleted";
 
     public static final String ORDER_PAYMENT_APPROVED = "order.payment.approved";
+    public static final String ORDER_PAYMENT_APPROVED_DLQ = ORDER_PAYMENT_APPROVED + ".dlq";
     public static final String ORDER_PAYMENT_PENDING = "order.payment.pending";
+    public static final String ORDER_PAYMENT_PENDING_DLQ = ORDER_PAYMENT_PENDING + ".dlq";
 
     @Bean("orderExchange")
     public DirectExchange orderExchange() {
-        return new DirectExchange(EXCHANGE_NAME);
+        return new DirectExchange(ORDER_EXCHANGE_NAME);
+    }
+
+    @Bean("orderDlxExchange")
+    public DirectExchange orderDlxExchange() {
+        return new DirectExchange(ORDER_DLX_EXCHANGE_NAME);
     }
 
     @Bean("createdOrderQueue")
     public Queue createdOrderQueue() {
-        return QueueBuilder.durable(CREATED_ORDER_QUEUE).quorum().build();
+        return QueueBuilder.durable(CREATED_ORDER_QUEUE)
+                .quorum()
+                .deadLetterExchange(ORDER_DLX_EXCHANGE_NAME)
+                .deadLetterRoutingKey(CREATED_ORDER_QUEUE)
+                .build();
+    }
+
+    @Bean("createdOrderDlq")
+    public Queue createdOrderDlq() {
+        return QueueBuilder.durable(CREATED_ORDER_QUEUE_DLQ).quorum().build();
+    }
+
+    @Bean
+    public Binding dlqBindingCreatedOrder(@Qualifier("createdOrderDlq") Queue queue, @Qualifier("orderDlxExchange") DirectExchange directExchange) {
+        return BindingBuilder.bind(queue).to(directExchange).with(CREATED_ORDER_QUEUE);
     }
 
     @Bean
@@ -98,7 +122,19 @@ public class RabbitMQConfig {
         return QueueBuilder
                 .durable(ORDER_PAYMENT_APPROVED)
                 .quorum()
+                .deadLetterExchange(PAYMENT_DLX_EXCHANGE_NAME)
+                .deadLetterRoutingKey(ORDER_PAYMENT_APPROVED)
                 .build();
+    }
+
+    @Bean("orderPaymentApprovedDlq")
+    public Queue orderPaymentApprovedDlq() {
+        return QueueBuilder.durable(ORDER_PAYMENT_APPROVED_DLQ).quorum().build();
+    }
+
+    @Bean
+    public Binding dlqBindingOrderPaymentApproved(@Qualifier("orderPaymentApprovedDlq") Queue queue, @Qualifier("orderDlxExchange") DirectExchange directExchange) {
+        return BindingBuilder.bind(queue).to(directExchange).with(ORDER_PAYMENT_APPROVED);
     }
 
     @Bean("orderPaymentPending")
@@ -106,7 +142,19 @@ public class RabbitMQConfig {
         return QueueBuilder
                 .durable(ORDER_PAYMENT_PENDING)
                 .quorum()
+                .deadLetterExchange(PAYMENT_DLX_EXCHANGE_NAME)
+                .deadLetterRoutingKey(ORDER_PAYMENT_PENDING)
                 .build();
+    }
+
+    @Bean("orderPaymentPendingDlq")
+    public Queue orderPaymentPendingDlq() {
+        return QueueBuilder.durable(ORDER_PAYMENT_PENDING_DLQ).quorum().build();
+    }
+
+    @Bean
+    public Binding dlqBindingOrderPaymentPending(@Qualifier("orderPaymentPendingDlq") Queue queue, @Qualifier("orderDlxExchange") DirectExchange directExchange) {
+        return BindingBuilder.bind(queue).to(directExchange).with(ORDER_PAYMENT_PENDING);
     }
 
     @Bean
