@@ -48,8 +48,7 @@ public class RouteSecurityConfig {
                         "/v3/api-docs/**",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
-                        "/actuator/health",
-                        "/api/v1/_ping"
+                        "/actuator/**"
                 ).permitAll()
                 .requestMatchers(HttpMethod.POST, "/auth").permitAll()
                 .requestMatchers(HttpMethod.GET, restaurantWithIdUrl, menuItemBaseUrl, menuWithIdUrl).permitAll()
