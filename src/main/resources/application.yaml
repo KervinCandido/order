@@ -15,8 +15,8 @@ spring:
   rabbitmq:
     host: ${MQ_HOST:localhost}
     port: ${MQ_PORT:5672}
-    username: ${MQ_USER:restaurant_mq_user}
-    password: ${MQ_PASSWORD:restaurant_mq_password}
+    username: ${MQ_USER:restaurant-mq}
+    password: ${MQ_PASSWORD:password-mq}
     listener.simple.acknowledge-mode: manual
 server:
   port: 8080
