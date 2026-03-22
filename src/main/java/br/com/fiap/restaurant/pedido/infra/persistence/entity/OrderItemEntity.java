@@ -12,7 +12,7 @@ public class OrderItemEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "menu_item_id", referencedColumnName = "id", nullable = false)
     private MenuItemEntity menuItem;
 
